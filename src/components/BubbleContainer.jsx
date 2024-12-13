@@ -63,43 +63,36 @@ const consoleScroll = keyframes`
 // Styled components (unchanged)
 const Container = styled.div`
   width: 100%;
-  height: calc(100vh - 124px);
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
-  position: relative;
-  margin: 0 auto;
-  margin-bottom: 16px;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
+  background: #000000;
+  font-family: 'Fira Code', monospace;
 
   @media (max-width: 768px) {
     height: auto;
-    min-height: calc(100vh - 90px);
-    padding: 0;
-    margin: 0;
-    padding-top: 110px;
-    margin-bottom: 16px;
-    overflow-y: auto;
+    min-height: 100vh;
+    padding-top: 56px;
   }
 `;
 
 const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
   width: 95%;
-  height: 100%;
-  background: #000;
-  border: 2px solid #333;
-  border-radius: 12px;
+  height: calc(100vh - 140px);
+  background: #0b0f12;
+  border: 1px solid #333;
+  border-radius: 8px;
   position: relative;
   overflow: hidden;
   padding: 0;
-  margin: 0 auto;
+  margin: 20px auto 60px;
   display: flex;
   flex-direction: column;
-  margin-bottom: 8px;
-  box-shadow: 
-    0 0 20px rgba(0, 0, 0, 0.4),
-    inset 0 0 30px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 
   &::before {
     content: '';
@@ -108,24 +101,28 @@ const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
     left: 0;
     right: 0;
     bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(32, 32, 32, 0.1) 0px,
-      rgba(32, 32, 32, 0.1) 1px,
-      transparent 1px,
-      transparent 4px
-    );
+    background: 
+      linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.02) 1px,
+        transparent 1px
+      );
+    background-size: 30px 30px;
     pointer-events: none;
+    opacity: 0.3;
   }
 
   @media (max-width: 768px) {
     width: 100%;
     border-radius: 0;
-    border-left: none;
-    border-right: none;
     height: auto;
-    min-height: calc(100vh - 142px);
-    overflow-y: auto;
+    min-height: calc(100vh - 180px);
+    margin: 0 0 60px;
   }
 `;
 
@@ -134,19 +131,20 @@ const Toolbar = styled.div`
   top: 32px;
   left: 0;
   right: 0;
-  height: 40px;
-  background: rgba(50, 205, 50, 0.05);
-  border-bottom: 1px solid ${colors.primary};
+  height: 48px;
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  gap: 8px;
+  padding: 0 16px;
+  gap: 12px;
   z-index: 3;
+  backdrop-filter: blur(10px);
 
   @media (max-width: 768px) {
     top: 0;
     position: fixed;
-    background: rgba(0, 0, 0, 0.95);
+    height: 56px;
   }
 `;
 
@@ -155,7 +153,7 @@ const BubblesArea = styled.div`
   top: 74px;
   left: 2px;
   right: 2px;
-  bottom: 2px;
+  bottom: 34px;
   box-sizing: border-box;
   background: repeating-linear-gradient(
     0deg,
@@ -164,6 +162,8 @@ const BubblesArea = styled.div`
     transparent 1px,
     transparent 2px
   );
+  border-bottom: 1px solid #333;
+  overflow: hidden;
 
   @media (max-width: 768px) {
     position: relative;
@@ -173,6 +173,7 @@ const BubblesArea = styled.div`
     bottom: 0;
     height: auto;
     padding: 16px;
+    margin-bottom: 60px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -183,7 +184,7 @@ const Canvas = styled.div`
   height: 100%;
   position: relative;
   background: transparent;
-  overflow-y: ${props => props.$isTable ? 'auto' : 'hidden'};
+  overflow: ${props => props.$isTable ? 'auto' : 'hidden'};
   -webkit-overflow-scrolling: touch;
 
   /* Cyberpunk scrollbar styling - only visible in table mode */
@@ -365,73 +366,73 @@ const StatusBar = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  height: 24px;
-  background: rgba(11, 15, 18, 0.95);
-  border-top: 1px solid ${colors.primary};
+  height: 40px;
+  background: #000000;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 4px solid #39FF14;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 12px;
+  padding: 8px 16px;
   font-family: monospace;
-  font-size: 11px;
-  color: ${colors.primary};
+  font-size: 12px;
+  color: #ffffff;
   z-index: 1000;
   overflow-x: auto;
   white-space: nowrap;
-  box-shadow: 0 -4px 20px ${colors.shadow};
-
-  /* Hide scrollbar but keep functionality */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
 `;
 
 const StatusSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   min-width: max-content;
-  padding: 0 12px;
+  padding: 0 16px;
   justify-content: center;
 `;
 
 const SocialIcon = styled.a`
-  color: ${colors.primary};
+  color: #999;
   opacity: 0.8;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
   font-size: 14px;
   text-decoration: none;
-  padding: 0 3px;
+  padding: 0 6px;
   
   &:hover {
     opacity: 1;
-    text-shadow: 0 0 5px ${colors.shadow};
+    color: #39FF14;
+    transform: scale(1.1);
   }
 `;
 
 const DonationText = styled.span`
   opacity: 0.8;
-  margin: 0 6px;
+  margin: 0 8px;
   font-weight: bold;
+  color: #39FF14;
 `;
 
 const WalletAddress = styled.button`
   background: none;
   border: none;
-  color: ${colors.primary};
+  color: #999;
   font-family: monospace;
   font-size: 11px;
-  padding: 0 4px;
-  margin: 0 2px;
+  padding: 4px 8px;
+  margin: 0 4px;
   cursor: pointer;
   opacity: 0.8;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
 
   &:hover {
     opacity: 1;
-    text-shadow: 0 0 5px ${colors.shadow};
+    color: #39FF14;
+    border-color: rgba(57, 255, 20, 0.3);
+    background: rgba(57, 255, 20, 0.1);
+    border-radius: 4px;
   }
 `;
 

@@ -20,14 +20,10 @@ const Background = styled.div`
   width: 100vw;
   height: 100vh;
   background: linear-gradient(
-    -45deg, 
-    rgba(0, 0, 0, 0.95), 
-    rgba(0, 20, 0, 0.98),
-    rgba(0, 40, 0, 0.95),
-    rgba(0, 10, 0, 0.97)
+    to bottom,
+    #050505,
+    #0a0a0a
   );
-  background-size: 400% 400%;
-  animation: ${gradientMove} 15s ease infinite;
   overflow: hidden;
   z-index: 0;
   
@@ -47,19 +43,10 @@ const Background = styled.div`
     background: 
       radial-gradient(
         circle at center,
-        rgba(57, 255, 20, 0.1) 0%,
-        rgba(0, 0, 0, 0.9) 100%
-      ),
-      repeating-linear-gradient(
-        0deg,
-        transparent 0px,
-        transparent 1px,
-        rgba(57, 255, 20, 0.03) 1px,
-        rgba(57, 255, 20, 0.03) 2px
+        rgba(255, 255, 255, 0.02) 0%,
+        transparent 70%
       );
     pointer-events: none;
-    opacity: 0.3;
-    animation: ${pulse} 4s ease-in-out infinite;
   }
 `;
 
@@ -70,25 +57,10 @@ const Grid = styled.div`
   right: 0;
   bottom: 0;
   background-image: 
-    linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   background-size: 50px 50px;
-  animation: ${pulse} 4s infinite;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(57, 255, 20, 0.1),
-      transparent 70%
-    );
-    pointer-events: none;
-  }
+  opacity: 0.3;
 `;
 
 const FloatingParticles = styled.div`
