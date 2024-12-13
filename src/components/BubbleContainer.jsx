@@ -128,7 +128,7 @@ const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
 
 const Toolbar = styled.div`
   position: absolute;
-  top: 32px;
+  top: ${props => props.$isMobile ? '82px' : '32px'};
   left: 0;
   right: 0;
   height: 48px;
@@ -142,7 +142,7 @@ const Toolbar = styled.div`
   backdrop-filter: blur(10px);
 
   @media (max-width: 768px) {
-    top: 0;
+    top: ${props => props.$isMobile ? '82px' : '0'};
     position: fixed;
     height: 56px;
   }
@@ -173,6 +173,7 @@ const BubblesArea = styled.div`
     bottom: 0;
     height: auto;
     padding: 16px;
+    margin-top: 138px;
     margin-bottom: 60px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -462,11 +463,17 @@ const MobileDisclaimer = styled.div`
     display: block;
     text-align: center;
     padding: 8px;
-    background: rgba(50, 205, 50, 0.05);
+    background: rgba(57, 255, 20, 0.05);
     color: ${colors.primary};
     font-size: 12px;
     font-style: italic;
-    border-bottom: 1px solid ${colors.primary};
+    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+    position: fixed;
+    top: 138px;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    backdrop-filter: blur(4px);
   }
 `;
 
@@ -503,6 +510,32 @@ const TerminalTitle = styled.div`
 
   ${mobile} {
     font-size: 12px;
+  }
+`;
+
+// Add this new styled component with the other styled components
+const MobileViewIndicator = styled.div`
+  width: 100%;
+  padding: 6px;
+  background: rgba(57, 255, 20, 0.05);
+  color: ${colors.primary};
+  font-size: 12px;
+  text-align: center;
+  font-family: monospace;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+  text-shadow: 0 0 5px ${colors.shadow};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  i {
+    font-size: 14px;
+  }
+
+  @media (min-width: 769px) {
+    display: none;
   }
 `;
 
@@ -1073,11 +1106,13 @@ const BubbleContainer = () => {
           </TerminalHeader>
         )}
         {isMobile && (
-          <MobileDisclaimer>
-            ⓘ Bubble view is optimized for desktop. Using table view for mobile devices.
-          </MobileDisclaimer>
+          <MobileViewIndicator>
+            <i className="fas fa-table"></i>
+            Table View Only on Mobile
+            <i className="fas fa-mobile-alt"></i>
+          </MobileViewIndicator>
         )}
-        <Toolbar>
+        <Toolbar $isMobile={isMobile}>
           <BubbleListSelector 
             onListChange={handleListChange} 
             setLoading={setIsLoading}
@@ -1099,6 +1134,11 @@ const BubbleContainer = () => {
             </ViewToggle>
           )}
         </Toolbar>
+        {isMobile && (
+          <MobileDisclaimer>
+            ⓘ For optimal experience, please use desktop version. Mobile view is limited.
+          </MobileDisclaimer>
+        )}
         <BubblesArea>
           <Canvas data-bubbles-area $isTable={viewMode === 'table' || isMobile}>
             {isLoading && <LoadingScreen />}
