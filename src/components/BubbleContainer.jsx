@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Bubble from './Bubble';
 import BubbleListSelector from './BubbleListSelector';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import '../styles/bubble-animations.css';
 import TokenModal from './TokenModal';
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force';
@@ -25,6 +25,40 @@ const copyToClipboard = async (text) => {
 // Add a media query helper
 const mobile = `@media (max-width: 768px)`;
 const smallMobile = `@media (max-width: 480px)`;
+
+// Add these keyframes at the top with other imports
+const gradientShift = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`;
+
+const gridPulse = keyframes`
+  0% {
+    opacity: 0.015;
+  }
+  50% {
+    opacity: 0.03;
+  }
+  100% {
+    opacity: 0.015;
+  }
+`;
+
+const consoleScroll = keyframes`
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 -100px;
+  }
+`;
 
 // Styled components (unchanged)
 const Container = styled.div`
@@ -53,8 +87,8 @@ const Container = styled.div`
 const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
   width: 95%;
   height: 100%;
-  background: ${colors.background};
-  border: 2px solid ${colors.primary};
+  background: #000;
+  border: 2px solid #333;
   border-radius: 12px;
   position: relative;
   overflow: hidden;
@@ -63,6 +97,26 @@ const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
   display: flex;
   flex-direction: column;
   margin-bottom: 8px;
+  box-shadow: 
+    0 0 20px rgba(0, 0, 0, 0.4),
+    inset 0 0 30px rgba(0, 0, 0, 0.8);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(32, 32, 32, 0.1) 0px,
+      rgba(32, 32, 32, 0.1) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    pointer-events: none;
+  }
 
   @media (max-width: 768px) {
     width: 100%;
@@ -105,8 +159,8 @@ const BubblesArea = styled.div`
   box-sizing: border-box;
   background: repeating-linear-gradient(
     0deg,
-    rgba(57, 255, 20, 0.03) 0px,
-    rgba(57, 255, 20, 0.03) 1px,
+    rgba(255, 255, 255, 0.02) 0px,
+    rgba(255, 255, 255, 0.02) 1px,
     transparent 1px,
     transparent 2px
   );
