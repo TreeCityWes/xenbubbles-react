@@ -26,6 +26,16 @@
   75% { transform: translate(-10px, 20px) rotate(3deg); }
 }
 
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
+}
+
+@keyframes redGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(255, 57, 57, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(255, 57, 57, 0.5); }
+}
+
 .bubble-float-0 { animation: float-0 15s ease-in-out infinite; }
 .bubble-float-1 { animation: float-1 18s ease-in-out infinite; }
 .bubble-float-2 { animation: float-2 20s ease-in-out infinite; }
@@ -34,6 +44,7 @@
 .App {
   position: relative;
   overflow: hidden;
+  background: radial-gradient(circle at center, #0b0f12, #000);
 }
 
 .App::before {
@@ -49,20 +60,50 @@
 
 .bubble-wrapper {
   position: absolute;
-  transition: transform 0.1s ease-out;
+  transition: transform 0.3s ease-out;
   will-change: transform;
   
   &:hover {
     z-index: 10;
+    transform: scale(1.05);
   }
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+.bubble {
+  background: radial-gradient(circle at center, rgba(0,0,0,0.85), rgba(0,0,0,0.95));
+  box-shadow: 
+    0 0 15px rgba(57, 255, 20, 0.2),
+    inset 0 0 10px rgba(57, 255, 20, 0.1);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
 }
 
-.bubble-pulse {
-  animation: pulse 2s ease-in-out infinite;
+.bubble:hover {
+  box-shadow: 
+    0 0 25px rgba(57, 255, 20, 0.4),
+    inset 0 0 15px rgba(57, 255, 20, 0.2);
+}
+
+.bubble.positive {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.bubble.negative {
+  animation: redGlow 2s ease-in-out infinite;
+}
+
+.logo-frame {
+  background: linear-gradient(135deg, rgba(57,255,20,0.1), rgba(57,255,20,0.05));
+  border: 1px solid rgba(57,255,20,0.4);
+  box-shadow: 
+    0 0 8px rgba(57,255,20,0.3),
+    inset 0 0 4px rgba(57,255,20,0.2);
+  transition: all 0.3s ease;
+}
+
+.logo-frame:hover {
+  transform: scale(1.1);
+  box-shadow: 
+    0 0 12px rgba(57,255,20,0.4),
+    inset 0 0 6px rgba(57,255,20,0.3);
 } 

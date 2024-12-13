@@ -17,6 +17,12 @@ const Background = styled.div`
   overflow: hidden;
   z-index: 0;
   
+  @media (max-width: 768px) {
+    position: fixed;
+    height: 100%;
+    pointer-events: none;
+  }
+  
   &::before {
     content: '';
     position: absolute;
