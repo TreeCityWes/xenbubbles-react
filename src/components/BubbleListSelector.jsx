@@ -10,92 +10,46 @@ const ListSelector = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
     padding: 8px;
     background: rgba(0, 0, 0, 0.95);
-    border-bottom: 1px solid #39FF14;
     z-index: 999;
     justify-content: center;
     gap: 4px;
   }
 `;
 
-const Button = styled.button`
-  background: rgba(57, 255, 20, 0.1);
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    gap: 4px;
+  }
+`;
+
+const ListButton = styled.button`
+  background: ${props => props.$active ? `rgba(50, 205, 50, 0.2)` : 'rgba(50, 205, 50, 0.05)'};
   color: #39FF14;
   border: 1px solid #39FF14;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  text-shadow: 0 0 5px #39FF14;
-  height: 36px;
+  font-size: 14px;
+  transition: all 0.2s;
+  white-space: nowrap;
 
   @media (max-width: 768px) {
-    font-size: 13px;
-    padding: 6px 8px;
-    height: 32px;
-    flex: 1;
-    max-width: 70px;
-    background: rgba(0, 0, 0, 0.8);
+    padding: 4px 8px;
+    font-size: 12px;
   }
 
-  ${props => props.active === 'true' && `
-    background: rgba(57, 255, 20, 0.2);
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
-    
-    @media (max-width: 768px) {
-      background: rgba(57, 255, 20, 0.3);
-    }
-  `}
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-
-  @media (max-width: 768px) {
-    margin-top: 70px; // Add space for the fixed header
-  }
-`;
-
-const ButtonGrid = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-
-  @media (max-width: 768px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    width: 200px;
-    margin: 0 auto;
-  }
-`;
-
-const DisclaimerText = styled.div`
-  color: rgba(57, 255, 20, 0.7);
-  font-size: 12px;
-  text-align: center;
-  margin-top: 8px;
-  font-style: italic;
-  
-  @media (min-width: 769px) {
-    display: none; // Only show on mobile
+  &:hover {
+    background: rgba(50, 205, 50, 0.2);
   }
 `;
 
 const BubbleListSelector = ({ onListChange, setLoading, timeFrame }) => {
-  const [activeList, setActiveList] = useState(() => {
-    // Default to 'ALL' on mobile, 'Xen' on desktop
-    return window.innerWidth <= 768 ? 'ALL' : 'Xen';
-  });
+  const [activeList, setActiveList] = useState('Xen');
   const [isLoading, setIsLoading] = useState(false);
   const initialLoadRef = useRef(false);
 
@@ -217,37 +171,38 @@ const BubbleListSelector = ({ onListChange, setLoading, timeFrame }) => {
   useEffect(() => {
     if (!initialLoadRef.current) {
       initialLoadRef.current = true;
-      // Load ALL by default on mobile, Xen on desktop
-      handleListChange(window.innerWidth <= 768 ? 'ALL' : 'Xen');
+      handleListChange('Xen'); // Always load Xen by default
     }
   }, [handleListChange]);
 
   return (
     <ListSelector>
-      <Button 
-        onClick={() => handleListChange('ALL')}
-        active={(activeList === 'ALL').toString()}
-      >
-        ALL
-      </Button>
-      <Button 
-        onClick={() => handleListChange('Xen')}
-        active={(activeList === 'Xen').toString()}
-      >
-        Xen
-      </Button>
-      <Button 
-        onClick={() => handleListChange('Xen-Alts')}
-        active={(activeList === 'Xen-Alts').toString()}
-      >
-        Alts
-      </Button>
-      <Button 
-        onClick={() => handleListChange('DBXen')}
-        active={(activeList === 'DBXen').toString()}
-      >
-        DBXen
-      </Button>
+      <ButtonGroup>
+        <ListButton 
+          onClick={() => handleListChange('ALL')}
+          $active={(activeList === 'ALL').toString()}
+        >
+          ALL
+        </ListButton>
+        <ListButton 
+          onClick={() => handleListChange('Xen')}
+          $active={(activeList === 'Xen').toString()}
+        >
+          Xen
+        </ListButton>
+        <ListButton 
+          onClick={() => handleListChange('Xen-Alts')}
+          $active={(activeList === 'Xen-Alts').toString()}
+        >
+          Alts
+        </ListButton>
+        <ListButton 
+          onClick={() => handleListChange('DBXen')}
+          $active={(activeList === 'DBXen').toString()}
+        >
+          DBXen
+        </ListButton>
+      </ButtonGroup>
     </ListSelector>
   );
 };

@@ -9,7 +9,10 @@ const TimeFrameContainer = styled.div`
   margin-left: auto;
   
   @media (max-width: 768px) {
-    display: none;
+    display: flex;
+    gap: 4px;
+    transform: scale(0.8);
+    margin-right: 8px;
   }
 `;
 
@@ -28,6 +31,11 @@ const TimeButton = styled.button`
   &:hover {
     background: rgba(50, 205, 50, 0.2);
     box-shadow: 0 0 10px ${colors.shadow};
+  }
+
+  @media (max-width: 768px) {
+    padding: 2px 6px;
+    font-size: 10px;
   }
 `;
 

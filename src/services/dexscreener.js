@@ -1,15 +1,27 @@
 const BASE_URL = 'https://api.dexscreener.com/latest';
+const cache = new Map();
+const CACHE_DURATION = 30000; // 30 seconds
 
 export const fetchTokenData = async (chain, contract, timeFrame = '24h') => {
+  const cacheKey = `${contract}-${timeFrame}`;
+  const now = Date.now();
+  
+  // Check cache
+  if (cache.has(cacheKey)) {
+    const cached = cache.get(cacheKey);
+    if (now - cached.timestamp < CACHE_DURATION) {
+      return cached.data;
+    }
+    cache.delete(cacheKey);
+  }
+
   try {
     const response = await fetch(`${BASE_URL}/dex/tokens/${contract}`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Origin': window.location.origin,
       },
-      mode: 'cors',
-      credentials: 'omit'
+      mode: 'cors'
     });
 
     if (!response.ok) {
@@ -17,29 +29,15 @@ export const fetchTokenData = async (chain, contract, timeFrame = '24h') => {
     }
     
     const data = await response.json();
-    
-    if (!data.pairs || data.pairs.length === 0) {
-      return null;
-    }
+    if (!data.pairs || data.pairs.length === 0) return null;
 
     const pair = data.pairs[0];
-    let priceChange;
+    const priceChange = timeFrame === '5m' ? pair.priceChange?.m5 :
+                       timeFrame === '1h' ? pair.priceChange?.h1 :
+                       timeFrame === '6h' ? pair.priceChange?.h6 :
+                       pair.priceChange?.h24;
 
-    switch(timeFrame) {
-      case '5m':
-        priceChange = pair.priceChange?.m5;
-        break;
-      case '1h':
-        priceChange = pair.priceChange?.h1;
-        break;
-      case '6h':
-        priceChange = pair.priceChange?.h6;
-        break;
-      default: // 24h
-        priceChange = pair.priceChange?.h24;
-    }
-
-    return {
+    const result = {
       price: parseFloat(pair.priceUsd),
       priceChange24h: priceChange,
       marketCap: pair.marketCap,
@@ -52,6 +50,13 @@ export const fetchTokenData = async (chain, contract, timeFrame = '24h') => {
       dexId: pair.dexId,
       pairAddress: pair.pairAddress
     };
+
+    cache.set(cacheKey, {
+      timestamp: now,
+      data: result
+    });
+
+    return result;
   } catch (error) {
     console.error('Error fetching token data:', error);
     return null;

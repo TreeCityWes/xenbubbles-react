@@ -1,80 +1,100 @@
-import React, { useState } from 'react';
+import React from 'react';
 import BubbleContainer from './components/BubbleContainer';
 import Layout from './components/Layout';
+import CyberpunkBackground from './components/CyberpunkBackground';
+import ErrorBoundary from './components/ErrorBoundary';
 import styled from 'styled-components';
+import './App.css';
 
-const MobileHeader = styled.div`
-  display: none;
-  
-  @media (max-width: 768px) {
+const AppContainer = styled.div`
+  position: relative;
+  min-height: 100vh;
+  color: #fff;
+`;
+
+const ContentWrapper = styled.div`
+  position: relative;
+  z-index: 1;
+`;
+
+const FooterIcons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 15px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  border-top: 1px solid rgba(57, 255, 20, 0.3);
+
+  a, a:visited, a:link {
+    color: rgb(57, 255, 20) !important;
+    font-size: 28px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.8)) brightness(1.2);
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    width: 100%;
-    height: 60px;
-    padding: 0 20px;
-    background: #000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    border-bottom: 2px solid #39FF14;
+    justify-content: center;
+    opacity: 1;
+    background: none;
+
+    i, svg {
+      color: rgb(57, 255, 20) !important;
+      filter: inherit;
+      opacity: 1;
+    }
+
+    &:hover {
+      color: rgb(57, 255, 20) !important;
+      filter: drop-shadow(0 0 12px rgba(57, 255, 20, 1)) brightness(1.4);
+      transform: scale(1.1);
+      
+      i, svg {
+        color: rgb(57, 255, 20) !important;
+      }
+    }
   }
-`;
 
-const HeaderTitle = styled.div`
-  color: #39FF14;
-  font-size: 28px;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-  font-family: monospace;
-`;
-
-const MenuButton = styled.button`
-  font-size: 24px;
-  color: #39FF14;
-  background: none;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-`;
-
-const MobileDisclaimer = styled.div`
-  display: none;
-  
   @media (max-width: 768px) {
-    display: block;
-    text-align: center;
-    padding: 8px;
-    background: rgba(57, 255, 20, 0.1);
-    color: #39FF14;
-    font-size: 12px;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    z-index: 999;
+    padding: 10px;
+    gap: 20px;
+    
+    a, a:visited, a:link {
+      font-size: 24px;
+    }
   }
 `;
 
 function App() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
   return (
-    <Layout>
-      <MobileHeader>
-        <HeaderTitle>HashHead.io</HeaderTitle>
-        <MenuButton 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-        >
-          {isMobileMenuOpen ? '✕' : '☰'}
-        </MenuButton>
-      </MobileHeader>
-      <MobileDisclaimer>
-        ⓘ Optimized for desktop viewing. Mobile experience may be limited.
-      </MobileDisclaimer>
-      <BubbleContainer />
-    </Layout>
+    <AppContainer>
+      <ErrorBoundary>
+        <CyberpunkBackground />
+        <ContentWrapper>
+          <Layout>
+            <BubbleContainer />
+          </Layout>
+        </ContentWrapper>
+        <FooterIcons>
+          <a href="https://store.hashhead.io" target="_blank" rel="noopener noreferrer">
+            <i className="fas fa-store"></i>
+          </a>
+          <a href="https://twitter.com/TreeCityWes" target="_blank" rel="noopener noreferrer">
+            <i className="fab fa-twitter"></i>
+          </a>
+          <a href="https://github.com/TreeCityWes/" target="_blank" rel="noopener noreferrer">
+            <i className="fab fa-github"></i>
+          </a>
+          <a href="/cdn-cgi/l/email-protection#3b4c5e487b4f495e5e58524f424f495a5f52555c154e48" target="_blank" rel="noopener noreferrer">
+            <i className="fas fa-envelope"></i>
+          </a>
+        </FooterIcons>
+      </ErrorBoundary>
+    </AppContainer>
   );
 }
 

@@ -9,13 +9,6 @@ const AppContainer = styled.div`
   width: 100%;
   height: 100vh;
   color: #fff;
-  
-  @media (max-width: 768px) {
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
 `;
 
 const Header = styled.header`
@@ -27,10 +20,6 @@ const Header = styled.header`
   top: 0;
   z-index: 1000;
   box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
-  
-  @media (max-width: 768px) {
-    display: none;
-  }
 `;
 
 const HeaderContainer = styled.div`
@@ -43,6 +32,10 @@ const Nav = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 `;
 
 const Logo = styled.a`
@@ -54,6 +47,10 @@ const Logo = styled.a`
   
   &:hover {
     text-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
+  }
+
+  @media (max-width: 768px) {
+    margin: 0 auto;
   }
 `;
 
@@ -72,6 +69,10 @@ const NavLinks = styled.div`
       color: #fff;
     }
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -79,41 +80,7 @@ const ContentWrapper = styled.div`
   z-index: 1;
   width: 100%;
   height: 100%;
-  padding-top: 80px; // Add padding to account for fixed header
-  
-  @media (max-width: 768px) {
-    height: auto;
-    min-height: 100vh;
-    padding-top: 0;
-  }
-`;
-
-const MobileHeader = styled.div`
-  display: none;
-  
-  @media (max-width: 768px) {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    width: 100%;
-    padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.9);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    border-bottom: 1px solid #39FF14;
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
-  }
-`;
-
-const HeaderTitle = styled.div`
-  color: #39FF14;
-  font-size: 24px;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
-  grid-column: 2;
-  text-align: center;
+  padding-top: 80px;
 `;
 
 function App() {
@@ -121,8 +88,6 @@ function App() {
     <ErrorBoundary>
       <AppContainer>
         <CyberpunkBackground />
-        
-        {/* Desktop Header */}
         <Header>
           <HeaderContainer>
             <Nav>
@@ -136,12 +101,6 @@ function App() {
             </Nav>
           </HeaderContainer>
         </Header>
-        
-        {/* Mobile Header */}
-        <MobileHeader>
-          <HeaderTitle>HashHead.io</HeaderTitle>
-        </MobileHeader>
-        
         <ContentWrapper>
           <BubbleContainer />
         </ContentWrapper>

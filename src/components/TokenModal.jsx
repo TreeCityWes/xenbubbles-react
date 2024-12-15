@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import xenLogo from '../assets/xen-logo.png';
 import dbxenLogo from '../assets/dbxen-logo.png';
 import treeLogo from '../assets/tree-logo.png';
+import { formatPrice } from './Bubble';
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -15,171 +16,187 @@ const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(5px);
 `;
 
 const ModalContent = styled.div`
-  background: rgba(0, 0, 0, 0.95);
-  border: 2px solid #39FF14;
-  border-radius: 12px;
+  background: #0b0f12;
+  border: 1px solid #39FF14;
+  border-radius: 8px;
   padding: 20px;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
+  max-width: 95%;
+  width: 800px;
   position: relative;
-  box-shadow: 
-    0 0 20px rgba(57, 255, 20, 0.3),
-    inset 0 0 20px rgba(57, 255, 20, 0.1);
-`;
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
+  z-index: 1001;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  color: #39FF14;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1;
-  
-  &:hover {
-    color: white;
-    text-shadow: 0 0 10px #39FF14;
+  @media (max-width: 768px) {
+    width: 90%;
+    padding: 12px;
+    margin: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
 `;
 
 const TokenHeader = styled.div`
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 15px;
-  padding-bottom: 15px;
-`;
+  margin-bottom: 20px;
+  width: 100%;
 
-const TokenLogo = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: 2px solid #39FF14;
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
 `;
 
 const TokenInfo = styled.div`
-  flex: 1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+  }
 `;
 
-const TokenSymbol = styled.h2`
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  justify-content: center;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    margin: 10px 0;
+  }
+`;
+
+const ActionButton = styled.a`
+  background: rgba(57, 255, 20, 0.1);
+  border: 1px solid #39FF14;
+  color: #39FF14;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 150px;
+  justify-content: center;
+  flex: 0 1 auto;
+
+  &:hover {
+    background: rgba(57, 255, 20, 0.2);
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex: 1;
+    min-width: calc(50% - 8px);
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 32px;
+  height: 32px;
+  background: #000;
+  border: 2px solid #39FF14;
+  border-radius: 50%;
+  color: #39FF14;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+  padding: 0;
+  line-height: 0;
+
+  & > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    margin-top: -2px;
+  }
+
+  &:hover {
+    background: rgba(57, 255, 20, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 28px;
+  }
+`;
+
+const TokenLogo = styled.img`
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: black;
+  padding: 5px;
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+  }
+`;
+
+const TokenName = styled.h2`
   color: #39FF14;
   margin: 0;
   font-size: 24px;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const TokenPrice = styled.div`
-  color: ${props => props.priceChange >= 0 ? '#39FF14' : '#FF3939'};
-  font-size: 20px;
-  margin-top: 5px;
-  text-shadow: 0 0 8px ${props => props.priceChange >= 0 ? 'rgba(57, 255, 20, 0.5)' : 'rgba(255, 57, 57, 0.5)'};
+  color: white;
+  font-size: 18px;
+  margin: 0;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: 16px;
+  }
 `;
 
 const PriceChange = styled.div`
-  color: ${props => props.positive ? '#39FF14' : '#FF3939'};
-  font-size: 20px;
-  margin-top: 5px;
-  text-shadow: 0 0 8px ${props => props.positive ? 'rgba(57, 255, 20, 0.5)' : 'rgba(255, 57, 57, 0.5)'};
-`;
+  color: ${props => props.$positive ? '#39FF14' : '#FF3939'};
+  font-size: 16px;
+  margin: 0;
+  white-space: nowrap;
 
-const ChartContainer = styled.div`
-  width: 100%;
-  height: 400px;
-  border: 1px solid rgba(57, 255, 20, 0.3);
-  border-radius: 8px;
-  overflow: hidden;
-`;
-
-const TokenDetails = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-top: 5px;
-`;
-
-const PriceInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ExplorerLinks = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const ExplorerLink = styled.a`
-  color: #39FF14;
-  text-decoration: none;
-  padding: 8px 12px;
-  text-align: center;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  border: 1px solid rgba(57, 255, 20, 0.3);
-  border-radius: 4px;
-  
-  &:hover {
-    background: rgba(57, 255, 20, 0.1);
-    text-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
-    border-color: #39FF14;
+  @media (max-width: 768px) {
+    font-size: 14px;
   }
 `;
-
-const formatPrice = (num) => {
-  if (!num) return '0.00';
-  
-  const str = num.toString();
-  
-  // For scientific notation (very small numbers)
-  if (str.includes('e-')) {
-    const [n, exp] = str.split('e-');
-    const zeroCount = parseInt(exp) - 1;
-    // Only use special notation for 4 or more zeros
-    if (zeroCount >= 3) {
-      const baseNum = (parseFloat(n) * Math.pow(10, -parseInt(exp))).toString().split('.')[1];
-      const significantDigits = baseNum.slice(0, 4);
-      return (
-        <>
-          0.0<sub>{zeroCount}</sub>{significantDigits}
-        </>
-      );
-    }
-  }
-  
-  // For regular decimal numbers
-  if (num < 1) {
-    const parts = str.split('.');
-    if (parts[1]) {
-      const zeros = parts[1].match(/^0+/)?.[0]?.length || 0;
-      // Only use special notation for 4 or more zeros
-      if (zeros >= 3) {
-        const significantDigits = parts[1].slice(zeros, zeros + 4);
-        return (
-          <>
-            0.0<sub>{zeros}</sub>{significantDigits}
-          </>
-        );
-      }
-      // For 1-2 zeros, show normally
-      return parseFloat(num).toFixed(8);
-    }
-  }
-  
-  // For regular numbers
-  if (num >= 1e9) return `${(num / 1e9).toFixed(2)}B`;
-  if (num >= 1e6) return `${(num / 1e6).toFixed(2)}M`;
-  if (num >= 1e3) return `${(num / 1e3).toFixed(2)}K`;
-  return parseFloat(num).toFixed(4);
-};
 
 const getPlaceholderLogo = (tokenListId) => {
   switch (tokenListId) {
@@ -193,6 +210,17 @@ const getPlaceholderLogo = (tokenListId) => {
       return xenLogo;
   }
 };
+
+const ChartFrame = styled.iframe`
+  width: 100%;
+  height: 500px;
+  border: none;
+
+  @media (max-width: 768px) {
+    height: 250px;
+    flex-shrink: 0;
+  }
+`;
 
 const TokenModal = ({ token, onClose }) => {
   // Move useState before any conditional returns
@@ -213,7 +241,9 @@ const TokenModal = ({ token, onClose }) => {
   return (
     <ModalOverlay onClick={onClose}>
       <ModalContent onClick={e => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>&times;</CloseButton>
+        <CloseButton onClick={onClose} aria-label="Close">
+          <span>×</span>
+        </CloseButton>
         
         <TokenHeader>
           <TokenLogo 
@@ -225,42 +255,32 @@ const TokenModal = ({ token, onClose }) => {
             alt={tokenSymbol}
           />
           <TokenInfo>
-            <TokenSymbol>{tokenSymbol}</TokenSymbol>
-            <TokenDetails>
-              <PriceInfo>
-                <TokenPrice>${formatPrice(tokenPrice)}</TokenPrice>
-                <PriceChange positive={priceChange >= 0}>
-                  {priceChange > 0 ? '+' : ''}{priceChange?.toFixed(2)}%
-                </PriceChange>
-              </PriceInfo>
-              <ExplorerLinks>
-                {token.pairAddress && (
-                  <>
-                    <ExplorerLink href={dexscreenerUrl} target="_blank" rel="noopener noreferrer">
-                      DexScreener
-                    </ExplorerLink>
-                    <ExplorerLink href={dextoolsUrl} target="_blank" rel="noopener noreferrer">
-                      DexTools
-                    </ExplorerLink>
-                  </>
-                )}
-              </ExplorerLinks>
-            </TokenDetails>
+            <TokenName>{tokenSymbol}</TokenName>
+            <TokenPrice>${formatPrice(tokenPrice)}</TokenPrice>
+            <PriceChange $positive={priceChange >= 0}>
+              {priceChange > 0 ? '+' : ''}{priceChange?.toFixed(2)}%
+            </PriceChange>
           </TokenInfo>
         </TokenHeader>
 
+        <ButtonGroup>
+          {token.pairAddress && (
+            <>
+              <ActionButton href={dexscreenerUrl} target="_blank" rel="noopener noreferrer">
+                DexScreener
+              </ActionButton>
+              <ActionButton href={dextoolsUrl} target="_blank" rel="noopener noreferrer">
+                DexTools
+              </ActionButton>
+            </>
+          )}
+        </ButtonGroup>
+
         {token.pairAddress && (
-          <ChartContainer>
-            <iframe
-              title="DexScreener Chart"
-              src={`${dexscreenerUrl}?embed=1&theme=dark`}
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none'
-              }}
-            />
-          </ChartContainer>
+          <ChartFrame
+            title="DexScreener Chart"
+            src={`${dexscreenerUrl}?embed=1&theme=dark`}
+          />
         )}
       </ModalContent>
     </ModalOverlay>

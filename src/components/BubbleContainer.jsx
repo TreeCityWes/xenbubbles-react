@@ -74,13 +74,15 @@ const Container = styled.div`
   font-family: 'Fira Code', monospace;
 
   @media (max-width: 768px) {
-    height: auto;
+    height: 100%;
     min-height: 100vh;
-    padding-top: 56px;
+    padding-top: 60px;
+    padding-bottom: 40px;
+    overflow-y: auto;
   }
 `;
 
-const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
+const BubblesGrid = styled.div`
   width: 95%;
   height: calc(100vh - 140px);
   background: #0b0f12;
@@ -94,63 +96,74 @@ const BubblesGrid = styled.div.attrs({ className: 'bubbles-grid' })`
   flex-direction: column;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px
-      ),
-      linear-gradient(
-        to right,
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px
-      );
-    background-size: 30px 30px;
-    pointer-events: none;
-    opacity: 0.3;
-  }
-
   @media (max-width: 768px) {
     width: 100%;
+    height: calc(100vh - 180px);
+    margin: 0;
     border-radius: 0;
-    height: auto;
-    min-height: calc(100vh - 180px);
-    margin: 0 0 60px;
+    border-left: 0;
+    border-right: 0;
   }
 `;
 
 const Toolbar = styled.div`
   position: absolute;
-  top: ${props => props.$isMobile ? '82px' : '32px'};
-  left: 0;
-  right: 0;
-  height: 48px;
-  background: #000000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  gap: 12px;
-  z-index: 3;
-  backdrop-filter: blur(10px);
+  justify-content: center;
+  z-index: 10;
+  padding: 8px 16px;
+  height: 40px;
 
   @media (max-width: 768px) {
-    top: ${props => props.$isMobile ? '82px' : '0'};
     position: fixed;
-    height: 56px;
+    left: 0;
+    right: 0;
+    transform: none;
+    top: 80px;
+    background: rgba(0, 0, 0, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    flex-direction: column;
+    padding: 8px;
+    z-index: 1000;
+  }
+`;
+
+const ToolbarRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 6px;
+    gap: 4px;
+    justify-content: center;
+    
+    &:first-child {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  }
+`;
+
+const ControlsGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 768px) {
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 `;
 
 const BubblesArea = styled.div`
   position: absolute;
-  top: 74px;
+  top: 41px;
   left: 2px;
   right: 2px;
   bottom: 34px;
@@ -164,19 +177,19 @@ const BubblesArea = styled.div`
   );
   border-bottom: 1px solid #333;
   overflow: hidden;
+  touch-action: none;
 
   @media (max-width: 768px) {
-    position: relative;
-    top: 0;
+    position: fixed;
+    top: 180px;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 40px;
     height: auto;
-    padding: 16px;
-    margin-top: 138px;
-    margin-bottom: 60px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
   }
 `;
 
@@ -186,38 +199,10 @@ const Canvas = styled.div`
   position: relative;
   background: transparent;
   overflow: ${props => props.$isTable ? 'auto' : 'hidden'};
-  -webkit-overflow-scrolling: touch;
-
-  /* Cyberpunk scrollbar styling - only visible in table mode */
-  ${props => props.$isTable && `
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(57, 255, 20, 0.3);
-      border-radius: 3px;
-      
-      &:hover {
-        background: rgba(57, 255, 20, 0.5);
-      }
-    }
-
-    /* Firefox */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(57, 255, 20, 0.3) transparent;
-  `}
 
   @media (max-width: 768px) {
-    position: relative;
-    height: auto;
-    padding: 8px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    height: 100%;
+    overflow: hidden;
   }
 `;
 
@@ -229,37 +214,33 @@ const BubbleWrapper = styled.div`
   will-change: transform;
   cursor: grab;
   user-select: none;
+  touch-action: none;
   
   @media (max-width: 768px) {
-    position: relative;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    transform: none !important;
-    margin: 0;
+    position: absolute;
+    width: ${props => props.size}px;
+    height: ${props => props.size}px;
+    &:active {
+      cursor: grabbing;
+      z-index: 1000;
+    }
   }
-  
-  font-size: ${props => Math.max(8, props.size * 0.15)}px;
 
-  img {
-    width: ${props => Math.max(16, props.size * 0.35)}px;
-    height: ${props => Math.max(16, props.size * 0.35)}px;
-  }
-  
-  .price-text {
-    font-size: ${props => Math.max(6, props.size * 0.12)}px;
-  }
-  
-  .percentage-text {
-    font-size: ${props => Math.max(7, props.size * 0.14)}px;
-  }
-  
-  &:active {
-    cursor: grabbing;
-  }
-  
-  &:hover {
-    z-index: 1000;
+  @media (max-width: 768px) {
+    .bubble {
+      transform-origin: center;
+      transition: transform 0.3s ease;
+      
+      &.price-up {
+        transform: scale(1.5);
+        animation: pulseGreen 2s infinite;
+      }
+      
+      &.price-down {
+        transform: scale(0.6);
+        animation: pulseRed 2s infinite;
+      }
+    }
   }
 `;
 
@@ -295,8 +276,10 @@ const ViewToggle = styled.div`
   margin-left: 12px;
   
   @media (max-width: 768px) {
-    margin-left: 0;
-    margin-top: 8px;
+    margin: 0;
+    gap: 4px;
+    transform: scale(0.8);
+    justify-content: center;
   }
 `;
 
@@ -305,6 +288,11 @@ const ToggleLabel = styled.span`
   font-size: 14px;
   opacity: ${props => props.$active ? 1 : 0.6};
   text-shadow: ${props => props.$active ? `0 0 5px ${colors.shadow}` : 'none'};
+
+  @media (max-width: 768px) {
+    font-size: 10px;
+    margin: 0 2px;
+  }
 `;
 
 const ToggleSwitch = styled.div`
@@ -322,42 +310,32 @@ const ToggleSwitch = styled.div`
     box-shadow: 0 0 15px ${colors.shadow};
   }
 
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 22px;
+    border-width: 1px;
+    border-radius: 11px;
+    background: ${props => props.$active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(0, 0, 0, 0.2)'};
+  }
+
   &::after {
     content: '';
     position: absolute;
     top: 2px;
-    left: ${props => props.$active ? '32px' : '2px'};
-    width: 22px;
-    height: 22px;
+    left: ${props => props.$active ? '28px' : '2px'};
+    width: 26px;
+    height: 26px;
     background: ${colors.primary};
     border-radius: 50%;
     transition: all 0.3s ease;
     box-shadow: 0 0 10px ${colors.shadow};
-  }
-`;
 
-const ScrollIndicator = styled.div`
-  display: none;
-  
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(57, 255, 20, 0.1);
-    border: 1px solid #39FF14;
-    border-radius: 20px;
-    padding: 10px;
-    color: #39FF14;
-    z-index: 1000;
-    cursor: pointer;
-    
-    &::after {
-      content: '${props => props.$isAtBottom ? '︿' : '﹀'}';
-      font-size: 24px;
-      line-height: 1;
+    @media (max-width: 768px) {
+      width: 18px;
+      height: 18px;
+      top: 1px;
+      left: ${props => props.$active ? 'calc(100% - 19px)' : '1px'};
+      box-shadow: 0 0 5px ${colors.shadow};
     }
   }
 `;
@@ -382,6 +360,15 @@ const StatusBar = styled.div`
   overflow-x: auto;
   white-space: nowrap;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 768px) {
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 10px;
+    border-bottom-width: 2px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 `;
 
 const StatusSection = styled.div`
@@ -391,6 +378,11 @@ const StatusSection = styled.div`
   min-width: max-content;
   padding: 0 16px;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+    padding: 0 8px;
+  }
 `;
 
 const SocialIcon = styled.a`
@@ -405,6 +397,11 @@ const SocialIcon = styled.a`
     opacity: 1;
     color: #39FF14;
     transform: scale(1.1);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    padding: 0 4px;
   }
 `;
 
@@ -435,6 +432,11 @@ const WalletAddress = styled.button`
     background: rgba(57, 255, 20, 0.1);
     border-radius: 4px;
   }
+
+  @media (max-width: 768px) {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
 `;
 
 const CopiedTooltip = styled.span`
@@ -456,42 +458,23 @@ const CopiedTooltip = styled.span`
   box-shadow: 0 0 10px ${colors.shadow};
 `;
 
-const MobileDisclaimer = styled.div`
-  display: none;
-  
-  @media (max-width: 768px) {
-    display: block;
-    text-align: center;
-    padding: 8px;
-    background: rgba(57, 255, 20, 0.05);
-    color: ${colors.primary};
-    font-size: 12px;
-    font-style: italic;
-    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
-    position: fixed;
-    top: 138px;
-    left: 0;
-    right: 0;
-    z-index: 999;
-    backdrop-filter: blur(4px);
-  }
-`;
-
 // Add back the TerminalHeader and TerminalTitle components
 const TerminalHeader = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 30px;
+  height: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 12px;
+  background: rgba(0, 0, 0, 0.95);
+  border-bottom: 1px solid rgba(57, 255, 20, 0.2);
   z-index: 3;
 
   @media (max-width: 768px) {
-    display: none; // Hide on mobile
+    display: none;
   }
 `;
 
@@ -553,6 +536,46 @@ const scatterBubbles = (bubbles, width, height) => {
   });
 };
 
+// Add new styled components
+const SizeToggle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 12px;
+  
+  @media (max-width: 768px) {
+    margin: 0;
+    gap: 4px;
+    transform: scale(0.8);
+    justify-content: center;
+  }
+`;
+
+// If you have keyframe animations, you might want to make them more dramatic too
+const pulseAnimation = keyframes`
+  0% {
+    transform: scale(1.5);
+  }
+  50% {
+    transform: scale(1.7); // More dramatic pulse
+  }
+  100% {
+    transform: scale(1.5);
+  }
+`;
+
+const shrinkAnimation = keyframes`
+  0% {
+    transform: scale(0.6);
+  }
+  50% {
+    transform: scale(0.4); // More dramatic shrink
+  }
+  100% {
+    transform: scale(0.6);
+  }
+`;
+
 const BubbleContainer = () => {
   const [currentList, setCurrentList] = useState([]);
   const [bubblePositions, setBubblePositions] = useState([]);
@@ -583,6 +606,8 @@ const BubbleContainer = () => {
   const [containerDimensions, setContainerDimensions] = useState({ width: 0, height: 0 });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [timeFrame, setTimeFrame] = useState('24h');
+  const [sizeMode, setSizeMode] = useState('priceChange');
+  const activeFetchesRef = useRef(new Set());
 
   const getBubbleSize = useCallback((token, totalTokens) => {
     if (!containerRef.current) return 140;
@@ -591,55 +616,67 @@ const BubbleContainer = () => {
     if (!bubblesArea) return 140;
     
     const areaRect = bubblesArea.getBoundingClientRect();
-    
     const isMobile = window.innerWidth <= 768;
-    if (isMobile) return 100;
     
+    // Calculate base size using a smaller divisor for larger bubbles
     const availableArea = areaRect.width * areaRect.height;
-    const baseSize = Math.sqrt(availableArea / (totalTokens * 3));
+    const baseSize = Math.sqrt(availableArea / (totalTokens * 1.2));
     
-    const minSize = Math.min(baseSize * 0.3, 60);
-    const maxSize = Math.min(baseSize * 1.5, 200);
-    
-    // Use absolute price change based on timeframe
-    const priceChange = Math.abs(token.priceChange24h || 0);
-    
-    // Adjust size multiplier based on timeframe
-    let sizeMultiplier;
-    switch(timeFrame) {
-      case '5m':
-        // More dramatic size changes for short timeframes
-        sizeMultiplier = priceChange === 0 ? 0.3 :
-          priceChange <= 0.5 ? 0.4 :
-          priceChange <= 2 ? 0.6 + (priceChange / 2) * 0.3 :
-          priceChange <= 5 ? 0.9 + (priceChange / 5) * 0.4 :
-          1.5;
-        break;
-      case '1h':
-        sizeMultiplier = priceChange === 0 ? 0.3 :
-          priceChange <= 1 ? 0.4 :
-          priceChange <= 3 ? 0.6 + (priceChange / 3) * 0.3 :
-          priceChange <= 8 ? 0.9 + (priceChange / 8) * 0.4 :
-          1.5;
-        break;
-      case '6h':
-        sizeMultiplier = priceChange === 0 ? 0.3 :
-          priceChange <= 2 ? 0.4 :
-          priceChange <= 5 ? 0.6 + (priceChange / 5) * 0.3 :
-          priceChange <= 15 ? 0.9 + (priceChange / 15) * 0.4 :
-          1.5;
-        break;
-      default: // 24h
-        sizeMultiplier = priceChange === 0 ? 0.3 :
-          priceChange <= 5 ? 0.4 :
-          priceChange <= 10 ? 0.6 + (priceChange / 10) * 0.3 :
-          priceChange <= 20 ? 0.9 + (priceChange / 20) * 0.4 :
-          1.5;
+    if (sizeMode === 'marketCap') {
+      const marketCaps = currentList.map(t => t.marketCap || 0).filter(mc => mc > 0);
+      const minMarketCap = Math.min(...marketCaps);
+      const maxMarketCap = Math.max(...marketCaps);
+      
+      const getLogScale = (value) => {
+        if (value <= 0) return 0;
+        const minLog = Math.log(minMarketCap);
+        const maxLog = Math.log(maxMarketCap);
+        const valueLog = Math.log(value);
+        return (valueLog - minLog) / (maxLog - minLog) || 0;
+      };
+
+      const marketCapRatio = getLogScale(token.marketCap || 0);
+      
+      if (isMobile) {
+        const minSize = 40;  // Reduced from 50
+        const maxSize = 120; // Increased from 90
+        return Math.max(minSize, Math.min(maxSize, minSize + (maxSize - minSize) * marketCapRatio));
+      }
+      
+      const minSize = Math.min(baseSize * 0.6, 100);
+      const maxSize = Math.min(baseSize * 2.0, 400);
+      return Math.max(minSize, Math.min(maxSize, minSize + (maxSize - minSize) * marketCapRatio));
     }
     
-    const size = minSize + (maxSize - minSize) * sizeMultiplier;
-    return Math.round(size);
-  }, [timeFrame]);
+    // Price change based sizing with more dramatic scaling for mobile
+    const priceChange = Math.abs(token.priceChange24h || 0);
+    
+    if (isMobile) {
+      const minSize = 40;  // Reduced minimum size
+      const maxSize = 120; // Increased maximum size
+      
+      // More dramatic scaling based on price change
+      const sizeMultiplier = priceChange === 0 ? 0.5 :
+        priceChange <= 5 ? 0.6 + (priceChange / 5) * 0.4 :
+        priceChange <= 10 ? 1.0 + (priceChange / 10) * 0.5 :
+        priceChange <= 20 ? 1.5 + (priceChange / 20) * 0.5 :
+        2.0;
+      
+      return Math.max(minSize, Math.min(maxSize, minSize * sizeMultiplier));
+    }
+    
+    // Desktop sizing remains the same
+    const minSize = Math.min(baseSize * 0.4, 80);
+    const maxSize = Math.min(baseSize * 1.4, 250);
+    
+    const sizeMultiplier = priceChange === 0 ? 0.4 :
+      priceChange <= 5 ? 0.5 + (priceChange / 5) * 0.3 :
+      priceChange <= 10 ? 0.8 + (priceChange / 10) * 0.3 :
+      priceChange <= 20 ? 1.1 + (priceChange / 20) * 0.2 :
+      1.3;
+    
+    return Math.round(minSize + (maxSize - minSize) * sizeMultiplier);
+  }, [timeFrame, sizeMode, currentList]);
 
   const initializeBubblePositions = useCallback((list) => {
     if (!list?.length || !containerRef.current) return;
@@ -650,23 +687,22 @@ const BubbleContainer = () => {
     const rect = bubblesArea.getBoundingClientRect();
     setContainerDimensions({ width: rect.width, height: rect.height });
 
-    if (bubblePositions.length === list.length) return;
-
+    const isMobile = window.innerWidth <= 768;
     const simulation = forceSimulation(list)
-      .force('charge', forceManyBody().strength(-300))
+      .force('charge', forceManyBody().strength(isMobile ? -50 : -400))
       .force('center', forceCenter(rect.width / 2, rect.height / 2))
-      .force('collision', forceCollide().radius(d => getBubbleSize(d, list.length) / 1.5 + 20))
-      .force('x', forceX(rect.width / 2).strength(0.02))
-      .force('y', forceY(rect.height / 2).strength(0.02))
+      .force('collision', forceCollide().radius(d => getBubbleSize(d, list.length) / 1.8))
+      .force('x', forceX(rect.width / 2).strength(isMobile ? 0.1 : 0.05))
+      .force('y', forceY(rect.height / 2).strength(isMobile ? 0.1 : 0.05))
       .stop();
 
-    for (let i = 0; i < 500; ++i) simulation.tick();
+    for (let i = 0; i < 300; ++i) simulation.tick();
 
     const bubbles = list.map((token, i) => {
       const node = simulation.nodes()[i];
       const size = getBubbleSize(token, list.length);
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 5 + 2;
+      const speed = Math.random() * (isMobile ? 2 : 5) + (isMobile ? 0.5 : 2);
       
       return {
         x: Math.max(size/2, Math.min(rect.width - size/2, node.x)),
@@ -678,7 +714,7 @@ const BubbleContainer = () => {
     });
 
     setBubblePositions(bubbles);
-  }, [getBubbleSize, bubblePositions.length]);
+  }, [getBubbleSize]);
 
   const handleListChange = useCallback(async (newList, selectedListId) => {
     setIsLoading(true);
@@ -733,7 +769,11 @@ const BubbleContainer = () => {
 
   const handleBubbleClick = useCallback((token) => {
     if (!token || !token.chain) return;
-    setSelectedToken(token);
+    setSelectedToken({
+      ...token,
+      price: token.price,
+      priceChange24h: token.priceChange24h
+    });
   }, []);
 
   const updateBubblePositions = useCallback(() => {
@@ -743,6 +783,8 @@ const BubbleContainer = () => {
     if (!area) return;
     
     const areaRect = area.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 768;
+    const padding = size => size * 0.1; // Dynamic padding based on bubble size
     
     setBubblePositions(prevPositions => {
       return prevPositions.map((bubble, i) => {
@@ -758,23 +800,28 @@ const BubbleContainer = () => {
         x += vx;
         y += vy;
         
-        const padding = size * 0.05;
+        const bubblePadding = padding(size);
         
-        // Softer boundary collisions
-        if (x < padding) {
-          x = padding;
-          vx = Math.abs(vx) * 0.3; // Reduced bounce
+        // Boundary checks
+        const minX = bubblePadding;
+        const maxX = areaRect.width - size - bubblePadding;
+        const minY = bubblePadding;
+        const maxY = areaRect.height - size - bubblePadding;
+        
+        if (x < minX) {
+          x = minX;
+          vx = Math.abs(vx) * 0.3;
         }
-        if (x > areaRect.width - size - padding) {
-          x = areaRect.width - size - padding;
+        if (x > maxX) {
+          x = maxX;
           vx = -Math.abs(vx) * 0.3;
         }
-        if (y < padding) {
-          y = padding;
+        if (y < minY) {
+          y = minY;
           vy = Math.abs(vy) * 0.3;
         }
-        if (y > areaRect.height - size - padding) {
-          y = areaRect.height - size - padding;
+        if (y > maxY) {
+          y = maxY;
           vy = -Math.abs(vy) * 0.3;
         }
 
@@ -826,142 +873,95 @@ const BubbleContainer = () => {
     }
   }, [viewMode, currentList, initializeBubblePositions]);
 
-  // Start dragging on mousedown
-  const handleMouseDown = (index, e) => {
+  // Move applyMomentum before the handlers
+  const applyMomentum = useCallback((index, vx, vy) => {
+    setBubblePositions(prev => {
+      const newPositions = [...prev];
+      if (!newPositions[index]) return prev;
+      
+      newPositions[index] = {
+        ...newPositions[index],
+        vx: vx,
+        vy: vy,
+        settling: true
+      };
+      return newPositions;
+    });
+  }, []);
+
+  // Then the mouse/touch handlers that use it
+  const handleMouseDown = useCallback((index, e) => {
     e.preventDefault();
-    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
     
-    const bubble = bubblePositions[index];
-    if (!bubble) return;
-
-    mouseRef.current = { x: e.clientX, y: e.clientY };
-
     dragRef.current = {
       index,
-      initialX: bubble.x,
-      initialY: bubble.y,
+      initialX: bubblePositions[index].x,
+      initialY: bubblePositions[index].y,
       startX: e.clientX,
       startY: e.clientY,
       isDragging: false,
       movementThreshold: 3,
       startTime: Date.now()
     };
-  };
+    
+    mouseRef.current = { x: e.clientX, y: e.clientY };
+  }, [bubblePositions]);
 
   const handleMouseMove = useCallback((e) => {
     if (!dragRef.current || dragRef.current.index === null) return;
-
-    const { index, startX, startY } = dragRef.current;
-    const bubble = bubblePositions[index];
-    if (!bubble) return;
-
-    const deltaX = e.clientX - startX;
-    const deltaY = e.clientY - startY;
-
+    
+    const deltaX = e.clientX - dragRef.current.startX;
+    const deltaY = e.clientY - dragRef.current.startY;
+    
     if (!dragRef.current.isDragging && 
         (Math.abs(deltaX) > dragRef.current.movementThreshold || 
          Math.abs(deltaY) > dragRef.current.movementThreshold)) {
       dragRef.current.isDragging = true;
       setIsDragging(true);
     }
-
+    
     if (dragRef.current.isDragging) {
-      const size = bubble.size || 50;
-      const newX = Math.max(0, Math.min(containerDimensions.width - size, bubble.x + (e.clientX - mouseRef.current.x)));
-      const newY = Math.max(32, Math.min(containerDimensions.height - size, bubble.y + (e.clientY - mouseRef.current.y)));
-
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-
       setBubblePositions(prev => {
         const newPositions = [...prev];
+        const index = dragRef.current.index;
         if (!newPositions[index]) return prev;
         
         newPositions[index] = {
           ...newPositions[index],
-          x: newX,
-          y: newY,
-          vx: e.movementX * 0.1,
-          vy: e.movementY * 0.1
+          x: dragRef.current.initialX + deltaX,
+          y: dragRef.current.initialY + deltaY,
+          vx: (e.clientX - mouseRef.current.x) * 0.1,
+          vy: (e.clientY - mouseRef.current.y) * 0.1
         };
+        
+        mouseRef.current = { x: e.clientX, y: e.clientY };
         return newPositions;
       });
     }
-  }, [bubblePositions, containerDimensions]);
+  }, []);
 
-  const applyMomentum = useCallback((index, initialVx, initialVy) => {
-    let vx = initialVx;
-    let vy = initialVy;
-    let frame = 0;
-    
-    const animate = () => {
-      if (Math.abs(vx) < 0.01 && Math.abs(vy) < 0.01) return;
-      
-      setBubblePositions(prev => {
-        const newPositions = [...prev];
-        const bubble = newPositions[index];
-        if (!bubble) return prev;
-
-        const friction = 0.95;
-        vx *= friction;
-        vy *= friction;
-
-        const newX = bubble.x + vx;
-        const newY = bubble.y + vy;
-
-        const size = bubble.size || 50;
-        const minX = 0;
-        const maxX = containerDimensions.width - size;
-        const minY = 32;
-        const maxY = containerDimensions.height - size;
-
-        if (newX < minX || newX > maxX) {
-          vx *= -0.8;
-        }
-        if (newY < minY || newY > maxY) {
-          vy *= -0.8;
-        }
-
-        newPositions[index] = {
-          ...bubble,
-          x: Math.max(minX, Math.min(maxX, newX)),
-          y: Math.max(minY, Math.min(maxY, newY)),
-          vx,
-          vy
-        };
-        return newPositions;
-      });
-
-      if (Math.abs(vx) > 0.01 || Math.abs(vy) > 0.01) {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    animate();
-    return () => cancelAnimationFrame(frame);
-  }, [containerDimensions]);
-
-  // Handle global mouse up
   const handleGlobalMouseUp = useCallback((e) => {
     if (!dragRef.current || dragRef.current.index === null) return;
-
+    
     const { index, isDragging, startTime } = dragRef.current;
     const timeDiff = Date.now() - startTime;
     const isQuickInteraction = timeDiff < 200;
-
-    const bubble = bubblePositions[index];
-    const token = currentList[index];
-
-    if (!isDragging && isQuickInteraction && token) {
-      // Click
-      handleBubbleClick(token);
-    } else if (isDragging && bubble) {
-      // Drag end with momentum
-      applyMomentum(index, bubble.vx || 0, bubble.vy || 0);
+    
+    if (!isDragging && isQuickInteraction) {
+      handleBubbleClick(currentList[index]);
+    } else if (isDragging) {
+      const bubble = bubblePositions[index];
+      if (bubble) {
+        const vx = (e.clientX - mouseRef.current.x) * 0.1;
+        const vy = (e.clientY - mouseRef.current.y) * 0.1;
+        applyMomentum(index, vx, vy);
+      }
     }
-
+    
     dragRef.current = { index: null };
     setIsDragging(false);
-  }, [bubblePositions, applyMomentum, handleBubbleClick, currentList]);
+  }, [bubblePositions, handleBubbleClick, currentList, applyMomentum]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
@@ -973,40 +973,84 @@ const BubbleContainer = () => {
     };
   }, [handleMouseMove, handleGlobalMouseUp]);
 
-  // Touch events adapted similarly to mouse
+  // Update the touch event handlers
   const handleTouchStart = useCallback((index, e) => {
+    e.preventDefault();
     const touch = e.touches[0];
-    const syntheticEvent = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      preventDefault: () => e.preventDefault(),
-      stopPropagation: () => e.stopPropagation()
+    
+    dragRef.current = {
+      index,
+      initialX: bubblePositions[index].x,
+      initialY: bubblePositions[index].y,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      isDragging: false,
+      movementThreshold: 3,
+      startTime: Date.now()
     };
-    handleMouseDown(index, syntheticEvent);
-  }, [handleMouseDown]);
+    
+    mouseRef.current = { x: touch.clientX, y: touch.clientY };
+  }, [bubblePositions]);
 
   const handleTouchMove = useCallback((e) => {
+    e.preventDefault();
+    if (!dragRef.current || dragRef.current.index === null) return;
+    
     const touch = e.touches[0];
-    const syntheticEvent = {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      preventDefault: () => e.preventDefault()
-    };
-    handleMouseMove(syntheticEvent);
-  }, [handleMouseMove]);
+    const deltaX = touch.clientX - dragRef.current.startX;
+    const deltaY = touch.clientY - dragRef.current.startY;
+    
+    if (!dragRef.current.isDragging && 
+        (Math.abs(deltaX) > dragRef.current.movementThreshold || 
+         Math.abs(deltaY) > dragRef.current.movementThreshold)) {
+      dragRef.current.isDragging = true;
+      setIsDragging(true);
+    }
+    
+    if (dragRef.current.isDragging) {
+      setBubblePositions(prev => {
+        const newPositions = [...prev];
+        const index = dragRef.current.index;
+        if (!newPositions[index]) return prev;
+        
+        newPositions[index] = {
+          ...newPositions[index],
+          x: dragRef.current.initialX + deltaX,
+          y: dragRef.current.initialY + deltaY,
+          vx: (touch.clientX - mouseRef.current.x) * 0.1,
+          vy: (touch.clientY - mouseRef.current.y) * 0.1
+        };
+        
+        mouseRef.current = { x: touch.clientX, y: touch.clientY };
+        return newPositions;
+      });
+    }
+  }, []);
 
   const handleTouchEnd = useCallback((e) => {
-    handleGlobalMouseUp(e);
-  }, [handleGlobalMouseUp]);
+    if (!dragRef.current || dragRef.current.index === null) return;
+    
+    const { index, isDragging, startTime } = dragRef.current;
+    const timeDiff = Date.now() - startTime;
+    const isQuickInteraction = timeDiff < 200;
+    
+    if (!isDragging && isQuickInteraction) {
+      handleBubbleClick(currentList[index]);
+    } else if (isDragging) {
+      const bubble = bubblePositions[index];
+      if (bubble) {
+        applyMomentum(index, bubble.vx || 0, bubble.vy || 0);
+      }
+    }
+    
+    dragRef.current = { index: null };
+    setIsDragging(false);
+  }, [bubblePositions, handleBubbleClick, currentList, applyMomentum]);
 
   useEffect(() => {
     const handleResize = () => {
       const isMobileView = window.innerWidth <= 768;
       setIsMobile(isMobileView);
-      if (isMobileView) {
-        setViewMode('table'); // Force table view on mobile
-        setSelectedTab('ALL'); // Force ALL view on mobile
-      }
       if (currentList.length) {
         initializeBubblePositions(currentList);
       }
@@ -1018,75 +1062,56 @@ const BubbleContainer = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [currentList, initializeBubblePositions]);
 
+  // Update the timeFrame effect
   useEffect(() => {
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      const percentage = (scrolled / maxScroll) * 70;
-      setScrollPercentage(percentage);
-      setIsAtBottom(Math.ceil(scrolled + window.innerHeight) >= document.documentElement.scrollHeight);
+    let isActive = true;
+
+    const fetchData = async () => {
+      if (!currentList.length || !viewMode === 'bubbles' || isLoading) return;
+      
+      setIsLoading(true);
+      try {
+        // Create a Map of unique tokens
+        const uniqueTokens = new Map();
+        currentList.forEach(token => {
+          const key = `${token.chain}-${token.contract}`;
+          if (!uniqueTokens.has(key)) {
+            uniqueTokens.set(key, token);
+          }
+        });
+
+        const tokens = Array.from(uniqueTokens.values());
+        const updatedTokens = await Promise.all(
+          tokens.map(async (token) => {
+            try {
+              const marketData = await fetchTokenData(token.chain, token.contract, timeFrame);
+              return marketData ? { ...token, ...marketData } : token;
+            } catch (error) {
+              console.error(`Error processing token ${token.contract}:`, error);
+              return token;
+            }
+          })
+        );
+
+        if (isActive) {
+          setCurrentList(updatedTokens);
+          initializeBubblePositions(updatedTokens);
+        }
+      } catch (error) {
+        console.error('Error updating tokens:', error);
+      } finally {
+        if (isActive) {
+          setIsLoading(false);
+        }
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    fetchData();
 
-  const handleScrollClick = () => {
-    if (isAtBottom) {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  // Modify the timeFrame effect
-  useEffect(() => {
-    if (currentList.length > 0 && viewMode === 'bubbles') {
-      const fetchData = async () => {
-        setIsLoading(true);
-        
-        try {
-          const processedTokens = await Promise.all(
-            currentList.map(async (token) => {
-              try {
-                const marketData = await fetchTokenData(token.chain, token.contract, timeFrame);
-                return { ...token, ...marketData };
-              } catch (error) {
-                console.error(`Error processing token ${token.contract}:`, error);
-                return token;
-              }
-            })
-          );
-
-          setCurrentList(processedTokens);
-          setBubblePositions(processedTokens.map((token, index) => {
-            const oldPosition = bubblePositions[index] || { x: 0, y: 0 };
-            return {
-              ...oldPosition,
-              size: getBubbleSize(token, processedTokens.length),
-              vx: oldPosition.vx || 0,
-              vy: oldPosition.vy || 0
-            };
-          }));
-        } catch (error) {
-          console.error('Error updating tokens and bubbles:', error);
-        } finally {
-          // Single timeout to remove loading state
-          setTimeout(() => {
-            setIsLoading(false);
-          }, 500);
-        }
-      };
-
-      fetchData();
-    }
-  }, [timeFrame, currentList.length, viewMode, getBubbleSize]);
+    return () => {
+      isActive = false;
+    };
+  }, [timeFrame, currentList.length, viewMode]);
 
   return (
     <Container ref={containerRef}>
@@ -1094,6 +1119,34 @@ const BubbleContainer = () => {
         {!isMobile && (
           <TerminalHeader>
             <TerminalTitle>XEN Network Monitor v1.0</TerminalTitle>
+            <ToolbarRow>
+              <BubbleListSelector 
+                onListChange={handleListChange} 
+                setLoading={setIsLoading}
+                timeFrame={timeFrame}
+              />
+              <TimeFrameSelector 
+                selectedTimeFrame={timeFrame}
+                onTimeFrameChange={setTimeFrame}
+                setLoading={setIsLoading}
+              />
+              <SizeToggle>
+                <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
+                <ToggleSwitch 
+                  $active={sizeMode === 'marketCap'} 
+                  onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
+                />
+                <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
+              </SizeToggle>
+              <ViewToggle>
+                <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
+                <ToggleSwitch 
+                  $active={viewMode === 'table'} 
+                  onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
+                />
+                <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
+              </ViewToggle>
+            </ToolbarRow>
             <DonationLinks>
               <DonationLink 
                 href="https://buymeacoffee.com/treecitywes" 
@@ -1105,46 +1158,49 @@ const BubbleContainer = () => {
             </DonationLinks>
           </TerminalHeader>
         )}
+        
+        {/* Mobile Toolbar */}
         {isMobile && (
-          <MobileViewIndicator>
-            <i className="fas fa-table"></i>
-            Table View Only on Mobile
-            <i className="fas fa-mobile-alt"></i>
-          </MobileViewIndicator>
-        )}
-        <Toolbar $isMobile={isMobile}>
-          <BubbleListSelector 
-            onListChange={handleListChange} 
-            setLoading={setIsLoading}
-            timeFrame={timeFrame}
-          />
-          <TimeFrameSelector 
-            selectedTimeFrame={timeFrame}
-            onTimeFrameChange={setTimeFrame}
-            setLoading={setIsLoading}
-          />
-          {!isMobile && (
-            <ViewToggle>
-              <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
-              <ToggleSwitch 
-                $active={viewMode === 'table'} 
-                onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
+          <Toolbar $isMobile={true}>
+            <ToolbarRow>
+              <BubbleListSelector 
+                onListChange={handleListChange} 
+                setLoading={setIsLoading}
+                timeFrame={timeFrame}
               />
-              <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
-            </ViewToggle>
-          )}
-        </Toolbar>
-        {isMobile && (
-          <MobileDisclaimer>
-            ⓘ For optimal experience, please use desktop version. Mobile view is limited.
-          </MobileDisclaimer>
+              <TimeFrameSelector 
+                selectedTimeFrame={timeFrame}
+                onTimeFrameChange={setTimeFrame}
+                setLoading={setIsLoading}
+              />
+            </ToolbarRow>
+            <ToolbarRow>
+              <SizeToggle>
+                <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
+                <ToggleSwitch 
+                  $active={sizeMode === 'marketCap'} 
+                  onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
+                />
+                <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
+              </SizeToggle>
+              <ViewToggle>
+                <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
+                <ToggleSwitch 
+                  $active={viewMode === 'table'} 
+                  onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
+                />
+                <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
+              </ViewToggle>
+            </ToolbarRow>
+          </Toolbar>
         )}
+        
         <BubblesArea>
-          <Canvas data-bubbles-area $isTable={viewMode === 'table' || isMobile}>
+          <Canvas data-bubbles-area $isTable={viewMode === 'table'}>
             {isLoading && <LoadingScreen />}
             {!isLoading && (
               <>
-                {!isMobile && viewMode === 'bubbles' && (
+                {viewMode === 'bubbles' && (
                   currentList
                     .filter(token => {
                       const symbol = token.baseToken?.symbol || token.symbol;
@@ -1171,13 +1227,14 @@ const BubbleContainer = () => {
                             color={token.color}
                             data={token}
                             selectedTab={selectedTab}
+                            sizeMode={sizeMode}
                           />
                         </BubbleWrapper>
                       );
                     })
                 )}
 
-                {(isMobile || viewMode === 'table') && (
+                {viewMode === 'table' && (
                   <TokenTable 
                     tokens={currentList} 
                     onTokenClick={handleBubbleClick}
@@ -1191,61 +1248,107 @@ const BubbleContainer = () => {
         </BubblesArea>
         <StatusBar>
           <StatusSection>
-            <SocialIcon href="https://youtube.com/@hashheadio" target="_blank">
+            <SocialIcon href="https://www.youtube.com/@TreeCityWes" target="_blank">
               <i className="fab fa-youtube"></i>
             </SocialIcon>
-            <SocialIcon href="https://twitter.com/hashheadio" target="_blank">
+            <SocialIcon href="https://twitter.com/TreeCityWes" target="_blank">
               <i className="fab fa-twitter"></i>
             </SocialIcon>
-            <SocialIcon href="https://github.com/hashheadio" target="_blank">
+            <SocialIcon href="https://github.com/TreeCityWes" target="_blank">
               <i className="fab fa-github"></i>
             </SocialIcon>
-            <SocialIcon href="https://t.me/hashheadio" target="_blank">
+            <SocialIcon href="https://t.me/TreeCityTrading" target="_blank">
               <i className="fab fa-telegram"></i>
             </SocialIcon>
             <SocialIcon href="https://buymeacoffee.com/treecitywes" target="_blank">
               <i className="fas fa-coffee"></i>
             </SocialIcon>
-            <DonationText>   Click To Copy Donation Address
-            </DonationText>
+
+            {/* Update the mobile wallet address buttons */}
             <WalletAddress 
               onClick={async () => {
-                await copyToClipboard('0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC');
-                setCopiedAddress('ETH');
-                setTimeout(() => setCopiedAddress(null), 2000);
+                try {
+                  await navigator.clipboard.writeText('0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC');
+                  setCopiedAddress('ETH');
+                  setTimeout(() => setCopiedAddress(null), 2000);
+                } catch (err) {
+                  // Fallback for browsers that don't support clipboard API
+                  const textArea = document.createElement('textarea');
+                  textArea.value = '0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC';
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  try {
+                    document.execCommand('copy');
+                    setCopiedAddress('ETH');
+                    setTimeout(() => setCopiedAddress(null), 2000);
+                  } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                  }
+                  document.body.removeChild(textArea);
+                }
               }}
             >
-            ETH: 0xe4b...9bC
+              {window.innerWidth > 768 ? 'ETH: 0xe4b...9bC' : 'ETH'}
               <CopiedTooltip $visible={copiedAddress === 'ETH'}>Copied!</CopiedTooltip>
             </WalletAddress>
+
             <WalletAddress 
               onClick={async () => {
-                await copyToClipboard('bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g');
-                setCopiedAddress('BTC');
-                setTimeout(() => setCopiedAddress(null), 2000);
+                try {
+                  await navigator.clipboard.writeText('bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g');
+                  setCopiedAddress('BTC');
+                  setTimeout(() => setCopiedAddress(null), 2000);
+                } catch (err) {
+                  // Fallback for browsers that don't support clipboard API
+                  const textArea = document.createElement('textarea');
+                  textArea.value = 'bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g';
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  try {
+                    document.execCommand('copy');
+                    setCopiedAddress('BTC');
+                    setTimeout(() => setCopiedAddress(null), 2000);
+                  } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                  }
+                  document.body.removeChild(textArea);
+                }
               }}
             >
-              BTC: bc1q...6g
+              {window.innerWidth > 768 ? 'BTC: bc1q...6g' : 'BTC'}
               <CopiedTooltip $visible={copiedAddress === 'BTC'}>Copied!</CopiedTooltip>
             </WalletAddress>
+
             <WalletAddress 
               onClick={async () => {
-                await copyToClipboard('8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x');
-                setCopiedAddress('SOL');
-                setTimeout(() => setCopiedAddress(null), 2000);
+                try {
+                  await navigator.clipboard.writeText('8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x');
+                  setCopiedAddress('SOL');
+                  setTimeout(() => setCopiedAddress(null), 2000);
+                } catch (err) {
+                  // Fallback for browsers that don't support clipboard API
+                  const textArea = document.createElement('textarea');
+                  textArea.value = '8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x';
+                  document.body.appendChild(textArea);
+                  textArea.select();
+                  try {
+                    document.execCommand('copy');
+                    setCopiedAddress('SOL');
+                    setTimeout(() => setCopiedAddress(null), 2000);
+                  } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                  }
+                  document.body.removeChild(textArea);
+                }
               }}
             >
-              SOL: 8bXf...6x
+              {window.innerWidth > 768 ? 'SOL: 8bXf...6x' : 'SOL'}
               <CopiedTooltip $visible={copiedAddress === 'SOL'}>Copied!</CopiedTooltip>
             </WalletAddress>
           </StatusSection>
         </StatusBar>
       </BubblesGrid>
 
-      <ScrollIndicator 
-        onClick={handleScrollClick}
-        $isAtBottom={isAtBottom}
-      />
       {selectedToken && (
         <TokenModal
           token={selectedToken}

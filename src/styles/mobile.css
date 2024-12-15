@@ -1,17 +1,14 @@
 @media (max-width: 768px) {
   html, body {
-    /* Remove fixed position to allow scrolling */
     position: static;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Prevent pull-to-refresh on mobile */
   body {
     overscroll-behavior-y: contain;
   }
 
-  /* Adjust touch handling */
   * {
     touch-action: none;
   }
@@ -27,7 +24,6 @@
     flex-wrap: wrap;
     gap: 8px;
     padding: 0 10px;
-    margin-top: 50px; /* Add space for hamburger menu */
   }
 
   .donation-address-text {
