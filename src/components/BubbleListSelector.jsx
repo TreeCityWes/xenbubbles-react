@@ -10,11 +10,10 @@ const ListSelector = styled.div`
 
   @media (max-width: 768px) {
     width: 100%;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.95);
+    padding: 4px;
+    background: transparent;
     z-index: 999;
     justify-content: center;
-    gap: 4px;
   }
 `;
 
@@ -24,11 +23,17 @@ const ButtonGroup = styled.div`
 
   @media (max-width: 768px) {
     gap: 4px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    grid-gap: 4px;
+    max-width: 280px;
+    margin: 0 auto;
   }
 `;
 
 const ListButton = styled.button`
-  background: ${props => props.$active ? `rgba(50, 205, 50, 0.2)` : 'rgba(50, 205, 50, 0.05)'};
+  background: ${props => props.$active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(57, 255, 20, 0.05)'};
   color: #39FF14;
   border: 1px solid #39FF14;
   padding: 6px 12px;
@@ -37,14 +42,20 @@ const ListButton = styled.button`
   font-size: 14px;
   transition: all 0.2s;
   white-space: nowrap;
+  min-width: 60px;
+  text-align: center;
 
-  @media (max-width: 768px) {
-    padding: 4px 8px;
-    font-size: 12px;
+  &:active {
+    transform: scale(0.95);
   }
 
-  &:hover {
-    background: rgba(50, 205, 50, 0.2);
+  @media (max-width: 768px) {
+    padding: 3px 6px;
+    font-size: 11px;
+    min-width: unset;
+    width: auto;
+    flex: 1;
+    max-width: 65px;
   }
 `;
 
@@ -52,6 +63,7 @@ const BubbleListSelector = ({ onListChange, setLoading, timeFrame }) => {
   const [activeList, setActiveList] = useState('Xen');
   const [isLoading, setIsLoading] = useState(false);
   const initialLoadRef = useRef(false);
+  const selectorRef = useRef(null);
 
   const lists = useMemo(() => [
     { id: 'ALL' },
@@ -80,7 +92,8 @@ const BubbleListSelector = ({ onListChange, setLoading, timeFrame }) => {
               .filter(token => token.chain && token.contract && token.chain !== '' && token.contract !== '')
               .map(token => ({
                 ...token,
-                sourceList: selectedList.id  // Use sourceList instead of listId
+                sourceList: selectedList.id,
+                uniqueKey: `${token.chain.toLowerCase()}-${token.contract.toLowerCase()}`
               }));
             resolve(validTokens);
           }
@@ -92,113 +105,139 @@ const BubbleListSelector = ({ onListChange, setLoading, timeFrame }) => {
     }
   }, [lists]);
 
-  const processTokens = useCallback(async (tokens, listId) => {
-    try {
-      const processedTokens = await Promise.all(
-        tokens.map(async (token) => {
-          try {
-            const marketData = await fetchTokenData(token.chain, token.contract, timeFrame);
-            return {
-              ...token,
-              ...marketData,
-              sourceList: token.sourceList || listId,
-              listId: token.sourceList || listId
-            };
-          } catch (error) {
-            console.error(`Error processing token ${token.contract}:`, error);
-            return null;
-          }
-        })
-      );
-
-      const filteredTokens = processedTokens.filter(token => token !== null);
-      setActiveList(listId);
-      onListChange(filteredTokens, listId);
-    } catch (error) {
-      console.error('Error processing tokens:', error);
-    }
-  }, [onListChange, timeFrame]);
-
-  const handleListChange = useCallback(async (newList) => {
+  const handleListChange = useCallback(async (newListId) => {
     if (isLoading) return;
     
     setIsLoading(true);
     setLoading(true);
-    onListChange([], newList); // Clear current list immediately
+    setActiveList(newListId);
 
     try {
-      let tokens = [];
+      let tokensToProcess = [];
       
-      if (newList === 'ALL') {
-        // Create a Map to track unique tokens by chain-contract combination
-        const uniqueTokens = new Map();
-        
-        // Load all lists in parallel
-        const listPromises = lists
-          .filter(list => list.id !== 'ALL' && list.url)
-          .map(async (list) => {
-            const listTokens = await loadSingleList(list.id);
-            // For each token in the list
-            listTokens.forEach(token => {
-              const key = `${token.chain}-${token.contract}`;
-              // Only add if we haven't seen this token before
-              if (!uniqueTokens.has(key)) {
-                uniqueTokens.set(key, {
-                  ...token,
-                  sourceList: list.id  // Preserve the source list
-                });
-              }
-            });
-          });
-        
-        await Promise.all(listPromises);
-        tokens = Array.from(uniqueTokens.values());
+      if (newListId === 'ALL') {
+        const allLists = await Promise.all(
+          lists
+            .filter(list => list.url)
+            .map(list => loadSingleList(list.id))
+        );
+        tokensToProcess = allLists.flat();
       } else {
-        tokens = await loadSingleList(newList);
+        const loadedTokens = await loadSingleList(newListId);
+        if (Array.isArray(loadedTokens)) {
+          tokensToProcess = loadedTokens;
+        }
       }
 
-      const validTokens = tokens.filter(token => token.chain && token.contract);
-      await processTokens(validTokens, newList);
+      if (!Array.isArray(tokensToProcess)) {
+        tokensToProcess = [];
+      }
+
+      const uniqueTokens = Array.from(
+        new Map(
+          tokensToProcess.map(token => 
+            [`${token.chain}-${token.contract}`, token]
+          )
+        ).values()
+      );
+
+      const processedTokens = await Promise.all(
+        uniqueTokens
+          .filter(token => token && token.chain && token.contract)
+          .map(async (token) => {
+            try {
+              const marketData = await fetchTokenData(
+                token.chain,
+                token.contract,
+                timeFrame
+              );
+
+              return {
+                ...token,
+                ...marketData,
+                chain: token.chain,
+                contract: token.contract,
+                sourceList: token.sourceList,
+                uniqueId: `${token.sourceList}-${token.chain.toLowerCase()}-${token.contract.toLowerCase()}-${Math.random()}`
+              };
+            } catch (error) {
+              console.error(`Error processing token ${token.chain}-${token.contract}:`, error);
+              return null;
+            }
+          })
+      );
+
+      const filteredTokens = processedTokens
+        .filter(token => token !== null)
+        .sort((a, b) => {
+          const listOrder = { 'Xen-Alts': 1, 'DBXen': 2, 'Xen': 3 };
+          const listCompare = (listOrder[a.sourceList] || 0) - (listOrder[b.sourceList] || 0);
+          if (listCompare !== 0) return listCompare;
+          
+          return a.chain.localeCompare(b.chain);
+        });
+
+      console.log('Processed tokens:', filteredTokens);
+      
+      onListChange(filteredTokens, newListId);
     } catch (error) {
       console.error('Error loading list data:', error);
+      onListChange([], newListId);
     } finally {
       setIsLoading(false);
       setLoading(false);
     }
-  }, [isLoading, loadSingleList, processTokens, onListChange, setLoading, lists]);
+  }, [isLoading, loadSingleList, onListChange, setLoading, lists, timeFrame]);
 
-  // Initial load - use useRef to ensure it only runs once
   useEffect(() => {
     if (!initialLoadRef.current) {
       initialLoadRef.current = true;
-      handleListChange('Xen'); // Always load Xen by default
+      handleListChange('Xen');
     }
   }, [handleListChange]);
 
+  useEffect(() => {
+    const handleLoadList = async (event) => {
+      const { listId } = event.detail;
+      await handleListChange(listId);
+    };
+
+    const selector = selectorRef.current;
+    if (selector) {
+      selector.addEventListener('loadList', handleLoadList);
+    }
+
+    return () => {
+      if (selector) {
+        selector.removeEventListener('loadList', handleLoadList);
+      }
+    };
+  }, [handleListChange]);
+
   return (
-    <ListSelector>
+    <ListSelector ref={selectorRef} data-list-selector>
       <ButtonGroup>
         <ListButton 
           onClick={() => handleListChange('ALL')}
-          $active={(activeList === 'ALL').toString()}
+          $active={activeList === 'ALL'}
         >
           ALL
         </ListButton>
         <ListButton 
           onClick={() => handleListChange('Xen')}
-          $active={(activeList === 'Xen').toString()}
+          $active={activeList === 'Xen'}
         >
           Xen
         </ListButton>
         <ListButton 
           onClick={() => handleListChange('Xen-Alts')}
-          $active={(activeList === 'Xen-Alts').toString()}
+          $active={activeList === 'Xen-Alts'}
         >
           Alts
         </ListButton>
         <ListButton 
           onClick={() => handleListChange('DBXen')}
-          $active={(activeList === 'DBXen').toString()}
+          $active={activeList === 'DBXen'}
         >
           DBXen
         </ListButton>

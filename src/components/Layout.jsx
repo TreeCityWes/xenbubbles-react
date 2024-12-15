@@ -10,6 +10,10 @@ const HeaderContainer = styled.header`
   backdrop-filter: blur(10px);
   border-bottom: 2px solid #39FF14;
   box-shadow: 0 0 30px rgba(57, 255, 20, 0.2);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const Nav = styled.nav`

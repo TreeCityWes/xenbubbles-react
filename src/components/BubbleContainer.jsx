@@ -74,11 +74,8 @@ const Container = styled.div`
   font-family: 'Fira Code', monospace;
 
   @media (max-width: 768px) {
-    height: 100%;
-    min-height: 100vh;
-    padding-top: 60px;
-    padding-bottom: 40px;
-    overflow-y: auto;
+    height: 100vh;
+    overflow: hidden;
   }
 `;
 
@@ -91,18 +88,17 @@ const BubblesGrid = styled.div`
   position: relative;
   overflow: hidden;
   padding: 0;
-  margin: 20px auto 60px;
+  margin: 0 auto 60px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 
   @media (max-width: 768px) {
     width: 100%;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 160px);
     margin: 0;
+    border: none;
     border-radius: 0;
-    border-left: 0;
-    border-right: 0;
   }
 `;
 
@@ -118,17 +114,29 @@ const Toolbar = styled.div`
   padding: 8px 16px;
   height: 40px;
 
-  @media (max-width: 768px) {
-    position: fixed;
-    left: 0;
-    right: 0;
-    transform: none;
-    top: 80px;
-    background: rgba(0, 0, 0, 0.95);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    flex-direction: column;
+  @media (max-height: 800px) {
+    height: 32px;
+    padding: 4px 8px;
+    
+    button {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-height: 600px) {
+    display: none;
+  }
+
+  @media (max-width: 1280px) {
+    & > div:last-child {
+      display: none;
+    }
     padding: 8px;
-    z-index: 1000;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -136,6 +144,10 @@ const ToolbarRow = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
+
+  @media (max-height: 800px) {
+    gap: 8px;
+  }
 
   @media (max-width: 768px) {
     width: 100%;
@@ -153,6 +165,10 @@ const ControlsGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+
+  @media (max-height: 800px) {
+    gap: 4px;
+  }
 
   @media (max-width: 768px) {
     gap: 6px;
@@ -181,7 +197,7 @@ const BubblesArea = styled.div`
 
   @media (max-width: 768px) {
     position: fixed;
-    top: 180px;
+    top: 105px;
     left: 0;
     right: 0;
     bottom: 40px;
@@ -190,6 +206,10 @@ const BubblesArea = styled.div`
     border: none;
     border-radius: 0;
     overflow: hidden;
+  }
+
+  @media (max-width: 480px) {
+    top: 180px;
   }
 `;
 
@@ -224,22 +244,13 @@ const BubbleWrapper = styled.div`
       cursor: grabbing;
       z-index: 1000;
     }
-  }
 
-  @media (max-width: 768px) {
-    .bubble {
-      transform-origin: center;
-      transition: transform 0.3s ease;
-      
-      &.price-up {
-        transform: scale(1.5);
-        animation: pulseGreen 2s infinite;
-      }
-      
-      &.price-down {
-        transform: scale(0.6);
-        animation: pulseRed 2s infinite;
-      }
+    // Ensure content fits inside bubble on mobile
+    & > div {
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 `;
@@ -272,14 +283,10 @@ const DonationLink = styled.a`
 const ViewToggle = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-left: 12px;
+  gap: 8px;
   
   @media (max-width: 768px) {
-    margin: 0;
     gap: 4px;
-    transform: scale(0.8);
-    justify-content: center;
   }
 `;
 
@@ -290,52 +297,41 @@ const ToggleLabel = styled.span`
   text-shadow: ${props => props.$active ? `0 0 5px ${colors.shadow}` : 'none'};
 
   @media (max-width: 768px) {
-    font-size: 10px;
-    margin: 0 2px;
+    font-size: 11px;
   }
 `;
 
 const ToggleSwitch = styled.div`
-  width: 60px;
-  height: 30px;
-  background: rgba(50, 205, 50, 0.1);
-  border: 2px solid ${colors.primary};
-  border-radius: 15px;
+  width: 50px;
+  height: 24px;
+  background: ${props => props.$active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(57, 255, 20, 0.05)'};
+  border: 1px solid #39FF14;
+  border-radius: 12px;
   position: relative;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px ${colors.shadow};
-
-  &:hover {
-    box-shadow: 0 0 15px ${colors.shadow};
-  }
-
-  @media (max-width: 768px) {
-    width: 40px;
-    height: 22px;
-    border-width: 1px;
-    border-radius: 11px;
-    background: ${props => props.$active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(0, 0, 0, 0.2)'};
-  }
 
   &::after {
     content: '';
     position: absolute;
     top: 2px;
-    left: ${props => props.$active ? '28px' : '2px'};
-    width: 26px;
-    height: 26px;
-    background: ${colors.primary};
+    left: ${props => props.$active ? 'calc(100% - 20px)' : '2px'};
+    width: 18px;
+    height: 18px;
+    background: #39FF14;
     border-radius: 50%;
     transition: all 0.3s ease;
-    box-shadow: 0 0 10px ${colors.shadow};
+  }
 
-    @media (max-width: 768px) {
-      width: 18px;
-      height: 18px;
-      top: 1px;
-      left: ${props => props.$active ? 'calc(100% - 19px)' : '1px'};
-      box-shadow: 0 0 5px ${colors.shadow};
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 20px;
+    
+    &::after {
+      width: 14px;
+      height: 14px;
+      top: 2px;
+      left: ${props => props.$active ? 'calc(100% - 16px)' : '2px'};
     }
   }
 `;
@@ -348,26 +344,20 @@ const StatusBar = styled.div`
   height: 40px;
   background: #000000;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 4px solid #39FF14;
+  border-bottom: 2px solid #39FF14;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 8px 16px;
+  padding: 4px 8px;
   font-family: monospace;
   font-size: 12px;
   color: #ffffff;
-  z-index: 1000;
-  overflow-x: auto;
+  z-index: 1500;
   white-space: nowrap;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
 
   @media (max-width: 768px) {
-    height: 32px;
-    padding: 4px 8px;
     font-size: 10px;
-    border-bottom-width: 2px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 `;
 
@@ -540,14 +530,10 @@ const scatterBubbles = (bubbles, width, height) => {
 const SizeToggle = styled.div`
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-left: 12px;
+  gap: 8px;
   
   @media (max-width: 768px) {
-    margin: 0;
     gap: 4px;
-    transform: scale(0.8);
-    justify-content: center;
   }
 `;
 
@@ -573,6 +559,147 @@ const shrinkAnimation = keyframes`
   }
   100% {
     transform: scale(0.6);
+  }
+`;
+
+// Add a new mobile controls component
+const MobileControls = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+    padding: 4px 4px 2px;
+    gap: 4px;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 1500;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+`;
+
+// Add MobileRow for organizing controls
+const MobileRow = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  padding: 2px 0;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(57, 255, 20, 0.1);
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+  }
+
+  & > * {
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 6px;
+  }
+`;
+
+// Add MobileControlsContainer to wrap all mobile controls
+const MobileControlsContainer = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 40px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+    z-index: 1001;
+  }
+`;
+
+// Add MobileToggles for the second row
+const MobileToggles = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    padding: 4px;
+    justify-content: center;
+    gap: 8px;
+    border-top: 1px solid rgba(57, 255, 20, 0.1);
+  }
+`;
+
+// Add MobileToggleRow for the toggle switches
+const MobileToggleRow = styled.div`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    width: 100%;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid rgba(57, 255, 20, 0.2);
+    padding: 4px 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+  }
+`;
+
+// Add this new component for mobile buttons
+const MobileButton = styled.button`
+  padding: 6px 10px;
+  font-size: 12px;
+  min-width: 80px;
+  text-align: center;
+  background: ${props => props.$active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(57, 255, 20, 0.05)'};
+  border: 1px solid #39FF14;
+  color: #39FF14;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  &:hover {
+    background: rgba(57, 255, 20, 0.2);
+  }
+
+  @media (max-width: 480px) {
+    width: 90%;
+    min-width: unset;
+    margin: 0 auto;
+  }
+`;
+
+// Update the toggles container
+const ToggleContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  padding: 0 4px;
+
+  @media (max-width: 768px) {
+    gap: 4px;
+    padding: 2px 4px 4px;
   }
 `;
 
@@ -610,18 +737,39 @@ const BubbleContainer = () => {
   const activeFetchesRef = useRef(new Set());
 
   const getBubbleSize = useCallback((token, totalTokens) => {
-    if (!containerRef.current) return 140;
+    if (!containerRef.current) return 120;
     
     const bubblesArea = containerRef.current.querySelector('[data-bubbles-area]');
-    if (!bubblesArea) return 140;
+    if (!bubblesArea) return 120;
     
     const areaRect = bubblesArea.getBoundingClientRect();
-    const isMobile = window.innerWidth <= 768;
+    const screenWidth = window.innerWidth;
     
-    // Calculate base size using a smaller divisor for larger bubbles
+    // Slightly reduced scale factors for lower resolutions
+    const getScaleFactor = () => {
+      if (screenWidth >= 3840) return 1.2;     // 4K - unchanged
+      if (screenWidth >= 2560) return 0.9;     // 1440p - reduced
+      if (screenWidth >= 1920) return 0.75;    // 1080p - reduced
+      return 0.6;                              // 720p - reduced
+    };
+
+    const scaleFactor = getScaleFactor();
+    
+    // Increased divisor for slightly smaller bubbles
     const availableArea = areaRect.width * areaRect.height;
-    const baseSize = Math.sqrt(availableArea / (totalTokens * 1.2));
-    
+    const baseSize = Math.sqrt(availableArea / (totalTokens * 1.8)) * scaleFactor;
+
+    // Adjusted minimum and maximum sizes
+    const minSize = screenWidth >= 1920 ? 90 :    // Reduced minimums
+                   screenWidth >= 1440 ? 80 : 
+                   screenWidth >= 1080 ? 70 : 
+                   60;
+
+    const maxSize = screenWidth >= 1920 ? 250 :   // Reduced maximums
+                   screenWidth >= 1440 ? 200 : 
+                   screenWidth >= 1080 ? 160 : 
+                   120;
+
     if (sizeMode === 'marketCap') {
       const marketCaps = currentList.map(t => t.marketCap || 0).filter(mc => mc > 0);
       const minMarketCap = Math.min(...marketCaps);
@@ -632,50 +780,22 @@ const BubbleContainer = () => {
         const minLog = Math.log(minMarketCap);
         const maxLog = Math.log(maxMarketCap);
         const valueLog = Math.log(value);
-        return (valueLog - minLog) / (maxLog - minLog) || 0;
+        return Math.pow((valueLog - minLog) / (maxLog - minLog), 1.1) || 0; // Slightly reduced exponential
       };
 
       const marketCapRatio = getLogScale(token.marketCap || 0);
-      
-      if (isMobile) {
-        const minSize = 40;  // Reduced from 50
-        const maxSize = 120; // Increased from 90
-        return Math.max(minSize, Math.min(maxSize, minSize + (maxSize - minSize) * marketCapRatio));
-      }
-      
-      const minSize = Math.min(baseSize * 0.6, 100);
-      const maxSize = Math.min(baseSize * 2.0, 400);
       return Math.max(minSize, Math.min(maxSize, minSize + (maxSize - minSize) * marketCapRatio));
     }
     
-    // Price change based sizing with more dramatic scaling for mobile
+    // Slightly reduced multipliers for price changes
     const priceChange = Math.abs(token.priceChange24h || 0);
+    const sizeMultiplier = priceChange === 0 ? 0.5 :
+      priceChange <= 5 ? 0.6 + (priceChange / 5) * 0.3 :
+      priceChange <= 10 ? 0.9 + (priceChange / 10) * 0.4 :
+      priceChange <= 20 ? 1.3 + (priceChange / 20) * 0.4 :
+      1.7;  // Reduced maximum multiplier
     
-    if (isMobile) {
-      const minSize = 40;  // Reduced minimum size
-      const maxSize = 120; // Increased maximum size
-      
-      // More dramatic scaling based on price change
-      const sizeMultiplier = priceChange === 0 ? 0.5 :
-        priceChange <= 5 ? 0.6 + (priceChange / 5) * 0.4 :
-        priceChange <= 10 ? 1.0 + (priceChange / 10) * 0.5 :
-        priceChange <= 20 ? 1.5 + (priceChange / 20) * 0.5 :
-        2.0;
-      
-      return Math.max(minSize, Math.min(maxSize, minSize * sizeMultiplier));
-    }
-    
-    // Desktop sizing remains the same
-    const minSize = Math.min(baseSize * 0.4, 80);
-    const maxSize = Math.min(baseSize * 1.4, 250);
-    
-    const sizeMultiplier = priceChange === 0 ? 0.4 :
-      priceChange <= 5 ? 0.5 + (priceChange / 5) * 0.3 :
-      priceChange <= 10 ? 0.8 + (priceChange / 10) * 0.3 :
-      priceChange <= 20 ? 1.1 + (priceChange / 20) * 0.2 :
-      1.3;
-    
-    return Math.round(minSize + (maxSize - minSize) * sizeMultiplier);
+    return Math.max(minSize, Math.min(maxSize, baseSize * sizeMultiplier));
   }, [timeFrame, sizeMode, currentList]);
 
   const initializeBubblePositions = useCallback((list) => {
@@ -687,29 +807,68 @@ const BubbleContainer = () => {
     const rect = bubblesArea.getBoundingClientRect();
     setContainerDimensions({ width: rect.width, height: rect.height });
 
-    const isMobile = window.innerWidth <= 768;
-    const simulation = forceSimulation(list)
-      .force('charge', forceManyBody().strength(isMobile ? -50 : -400))
-      .force('center', forceCenter(rect.width / 2, rect.height / 2))
-      .force('collision', forceCollide().radius(d => getBubbleSize(d, list.length) / 1.8))
-      .force('x', forceX(rect.width / 2).strength(isMobile ? 0.1 : 0.05))
-      .force('y', forceY(rect.height / 2).strength(isMobile ? 0.1 : 0.05))
-      .stop();
+    // Initial spread - distribute bubbles in a grid pattern
+    const totalBubbles = list.length;
+    const columns = Math.ceil(Math.sqrt(totalBubbles));
+    const rows = Math.ceil(totalBubbles / columns);
+    const cellWidth = rect.width / columns;
+    const cellHeight = rect.height / rows;
 
-    for (let i = 0; i < 300; ++i) simulation.tick();
-
-    const bubbles = list.map((token, i) => {
-      const node = simulation.nodes()[i];
+    // Create initial positions with wider spread
+    const initialPositions = list.map((token, i) => {
       const size = getBubbleSize(token, list.length);
+      const row = Math.floor(i / columns);
+      const col = i % columns;
+      
+      // Increase random offset for better initial spread
+      const randomX = (Math.random() - 0.5) * (cellWidth * 0.8);
+      const randomY = (Math.random() - 0.5) * (cellHeight * 0.8);
+      
+      // Add initial velocity for more dynamic movement
       const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * (isMobile ? 2 : 5) + (isMobile ? 0.5 : 2);
+      const speed = Math.random() * 5 + 2;
       
       return {
-        x: Math.max(size/2, Math.min(rect.width - size/2, node.x)),
-        y: Math.max(32 + size/2, Math.min(rect.height - size/2, node.y)),
+        ...token,
+        x: (col + 0.5) * cellWidth + randomX,
+        y: (row + 0.5) * cellHeight + randomY,
         size: size,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed
+      };
+    });
+
+    // Adjust force strength based on screen size
+    const screenWidth = window.innerWidth;
+    const forceStrength = screenWidth >= 3840 ? -600 :  // Increased repulsion
+                         screenWidth >= 2560 ? -450 :
+                         screenWidth >= 1920 ? -300 :
+                         -200;
+
+    // Create simulation with modified forces
+    const simulation = forceSimulation(initialPositions)
+      .force('charge', forceManyBody().strength(forceStrength))
+      .force('center', forceCenter(rect.width / 2, rect.height / 2).strength(0.01)) // Reduced center force
+      .force('collision', forceCollide().radius(d => d.size / 1.5).strength(0.8)) // Increased collision radius and strength
+      .force('x', forceX(rect.width / 2).strength(0.02)) // Reduced x force
+      .force('y', forceY(rect.height / 2).strength(0.02)) // Reduced y force
+      .stop();
+
+    // Run simulation iterations
+    const iterations = screenWidth >= 1920 ? 150 : 100; // Increased iterations
+    for (let i = 0; i < iterations; ++i) simulation.tick();
+
+    // Apply final positions with boundaries and initial velocities
+    const bubbles = simulation.nodes().map(node => {
+      const size = node.size;
+      const padding = size * 0.5; // Added padding from edges
+      
+      return {
+        x: Math.max(padding, Math.min(rect.width - padding, node.x)),
+        y: Math.max(32 + padding, Math.min(rect.height - padding, node.y)),
+        size: size,
+        vx: (Math.random() - 0.5) * 3, // Increased initial velocity
+        vy: (Math.random() - 0.5) * 3
       };
     });
 
@@ -718,8 +877,21 @@ const BubbleContainer = () => {
 
   const handleListChange = useCallback(async (newList, selectedListId) => {
     setIsLoading(true);
-    setSelectedTab(selectedListId);
     
+    // If newList is a string (tab ID), we need to fetch the list from BubbleListSelector
+    if (typeof newList === 'string') {
+      selectedListId = newList;
+      // Let BubbleListSelector handle loading the list
+      const listSelector = document.querySelector('[data-list-selector]');
+      if (listSelector) {
+        listSelector.dispatchEvent(new CustomEvent('loadList', { detail: { listId: selectedListId } }));
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    setSelectedTab(selectedListId);
+
     if (newList && newList.length > 0) {
       const validTokens = newList.filter(token => {
         const symbol = token.baseToken?.symbol || token.symbol;
@@ -729,29 +901,16 @@ const BubbleContainer = () => {
       try {
         const processedTokens = await Promise.all(
           validTokens.map(async (token) => {
-            // Store original logo URLs before fetching market data
-            const originalLogoUrl = token.logoUrl || token.imageUrl;
-            const originalImageUrl = token.imageUrl || token.logoUrl;
-            
             try {
               const marketData = await fetchTokenData(token.chain, token.contract, timeFrame);
               return {
                 ...token,
                 ...marketData,
-                // Preserve original logo URLs if market data doesn't provide new ones
-                logoUrl: marketData.logoUrl || originalLogoUrl || token.logo,
-                imageUrl: marketData.imageUrl || originalImageUrl || token.logo,
                 listId: selectedListId
               };
             } catch (error) {
               console.error(`Error processing token ${token.contract}:`, error);
-              // Return token with original logos if market data fetch fails
-              return {
-                ...token,
-                logoUrl: originalLogoUrl || token.logo,
-                imageUrl: originalImageUrl || token.logo,
-                listId: selectedListId
-              };
+              return token;
             }
           })
         );
@@ -768,13 +927,18 @@ const BubbleContainer = () => {
   }, [initializeBubblePositions, viewMode, timeFrame]);
 
   const handleBubbleClick = useCallback((token) => {
-    if (!token || !token.chain) return;
+    if (!token?.chain || isDragging) return;
     setSelectedToken({
       ...token,
+      chain: token.chain,
+      contract: token.contract,
       price: token.price,
-      priceChange24h: token.priceChange24h
+      priceChange24h: token.priceChange24h,
+      symbol: token.baseToken?.symbol || token.symbol,
+      name: token.baseToken?.name || token.name,
+      logoUrl: token.logoUrl || token.imageUrl || token.logo
     });
-  }, []);
+  }, [isDragging]);
 
   const updateBubblePositions = useCallback(() => {
     if (!containerRef.current || viewMode !== 'bubbles') return;
@@ -1115,86 +1279,88 @@ const BubbleContainer = () => {
 
   return (
     <Container ref={containerRef}>
+      <MobileControls>
+        <MobileRow>
+          <BubbleListSelector 
+            onListChange={handleListChange} 
+            setLoading={setIsLoading}
+            timeFrame={timeFrame}
+          />
+        </MobileRow>
+        <MobileRow>
+          <TimeFrameSelector 
+            selectedTimeFrame={timeFrame}
+            onTimeFrameChange={(newTimeFrame) => {
+              setTimeFrame(newTimeFrame);
+              handleListChange(selectedTab);
+            }}
+            setLoading={setIsLoading}
+          />
+        </MobileRow>
+        <ToggleContainer>
+          <SizeToggle>
+            <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
+            <ToggleSwitch 
+              $active={sizeMode === 'marketCap'} 
+              onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
+            />
+            <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
+          </SizeToggle>
+          <ViewToggle>
+            <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
+            <ToggleSwitch 
+              $active={viewMode === 'table'} 
+              onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
+            />
+            <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
+          </ViewToggle>
+        </ToggleContainer>
+      </MobileControls>
+
       <BubblesGrid>
-        {!isMobile && (
-          <TerminalHeader>
-            <TerminalTitle>XEN Network Monitor v1.0</TerminalTitle>
-            <ToolbarRow>
-              <BubbleListSelector 
-                onListChange={handleListChange} 
-                setLoading={setIsLoading}
-                timeFrame={timeFrame}
+        <Toolbar>
+          <ToolbarRow>
+            <BubbleListSelector 
+              onListChange={handleListChange} 
+              setLoading={setIsLoading}
+              timeFrame={timeFrame}
+            />
+            <TimeFrameSelector 
+              selectedTimeFrame={timeFrame}
+              onTimeFrameChange={(newTimeFrame) => {
+                setTimeFrame(newTimeFrame);
+                handleListChange(selectedTab);
+              }}
+              setLoading={setIsLoading}
+            />
+            <SizeToggle>
+              <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
+              <ToggleSwitch 
+                $active={sizeMode === 'marketCap'} 
+                onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
               />
-              <TimeFrameSelector 
-                selectedTimeFrame={timeFrame}
-                onTimeFrameChange={setTimeFrame}
-                setLoading={setIsLoading}
+              <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
+            </SizeToggle>
+            <ViewToggle>
+              <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
+              <ToggleSwitch 
+                $active={viewMode === 'table'} 
+                onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
               />
-              <SizeToggle>
-                <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
-                <ToggleSwitch 
-                  $active={sizeMode === 'marketCap'} 
-                  onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
-                />
-                <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
-              </SizeToggle>
-              <ViewToggle>
-                <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
-                <ToggleSwitch 
-                  $active={viewMode === 'table'} 
-                  onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
-                />
-                <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
-              </ViewToggle>
-            </ToolbarRow>
-            <DonationLinks>
-              <DonationLink 
-                href="https://buymeacoffee.com/treecitywes" 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
-                ☕ Buy me a coffee
-              </DonationLink>
-            </DonationLinks>
-          </TerminalHeader>
-        )}
-        
-        {/* Mobile Toolbar */}
-        {isMobile && (
-          <Toolbar $isMobile={true}>
-            <ToolbarRow>
-              <BubbleListSelector 
-                onListChange={handleListChange} 
-                setLoading={setIsLoading}
-                timeFrame={timeFrame}
-              />
-              <TimeFrameSelector 
-                selectedTimeFrame={timeFrame}
-                onTimeFrameChange={setTimeFrame}
-                setLoading={setIsLoading}
-              />
-            </ToolbarRow>
-            <ToolbarRow>
-              <SizeToggle>
-                <ToggleLabel $active={sizeMode === 'priceChange'}>Price Δ</ToggleLabel>
-                <ToggleSwitch 
-                  $active={sizeMode === 'marketCap'} 
-                  onClick={() => setSizeMode(prev => prev === 'priceChange' ? 'marketCap' : 'priceChange')}
-                />
-                <ToggleLabel $active={sizeMode === 'marketCap'}>MCap</ToggleLabel>
-              </SizeToggle>
-              <ViewToggle>
-                <ToggleLabel $active={viewMode === 'bubbles'}>Bubble</ToggleLabel>
-                <ToggleSwitch 
-                  $active={viewMode === 'table'} 
-                  onClick={() => setViewMode(prev => prev === 'bubbles' ? 'table' : 'bubbles')}
-                />
-                <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
-              </ViewToggle>
-            </ToolbarRow>
-          </Toolbar>
-        )}
-        
+              <ToggleLabel $active={viewMode === 'table'}>Table</ToggleLabel>
+            </ViewToggle>
+          </ToolbarRow>
+          <DonationLinks>
+            <DonationLink 
+              href="https://buymeacoffee.com/treecitywes" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              ☕ Buy me a coffee
+            </DonationLink>
+          </DonationLinks>
+        </Toolbar>
+
         <BubblesArea>
           <Canvas data-bubbles-area $isTable={viewMode === 'table'}>
             {isLoading && <LoadingScreen />}
@@ -1246,113 +1412,114 @@ const BubbleContainer = () => {
             )}
           </Canvas>
         </BubblesArea>
-        <StatusBar>
-          <StatusSection>
-            <SocialIcon href="https://www.youtube.com/@TreeCityWes" target="_blank">
-              <i className="fab fa-youtube"></i>
-            </SocialIcon>
-            <SocialIcon href="https://twitter.com/TreeCityWes" target="_blank">
-              <i className="fab fa-twitter"></i>
-            </SocialIcon>
-            <SocialIcon href="https://github.com/TreeCityWes" target="_blank">
-              <i className="fab fa-github"></i>
-            </SocialIcon>
-            <SocialIcon href="https://t.me/TreeCityTrading" target="_blank">
-              <i className="fab fa-telegram"></i>
-            </SocialIcon>
-            <SocialIcon href="https://buymeacoffee.com/treecitywes" target="_blank">
-              <i className="fas fa-coffee"></i>
-            </SocialIcon>
+      </BubblesGrid>
 
-            {/* Update the mobile wallet address buttons */}
-            <WalletAddress 
-              onClick={async () => {
+      <StatusBar>
+        <StatusSection>
+          <SocialIcon href="https://www.youtube.com/@TreeCityWes" target="_blank">
+            <i className="fab fa-youtube"></i>
+          </SocialIcon>
+          <SocialIcon href="https://twitter.com/TreeCityWes" target="_blank">
+            <i className="fab fa-twitter"></i>
+          </SocialIcon>
+          <SocialIcon href="https://github.com/TreeCityWes" target="_blank">
+            <i className="fab fa-github"></i>
+          </SocialIcon>
+          <SocialIcon href="https://t.me/TreeCityTrading" target="_blank">
+            <i className="fab fa-telegram"></i>
+          </SocialIcon>
+          <SocialIcon href="https://buymeacoffee.com/treecitywes" target="_blank">
+            <i className="fas fa-coffee"></i>
+          </SocialIcon>
+
+          <WalletAddress 
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText('0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC');
+                setCopiedAddress('ETH');
+                setTimeout(() => setCopiedAddress(null), 2000);
+              } catch (err) {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = '0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC';
+                document.body.appendChild(textArea);
+                textArea.select();
                 try {
-                  await navigator.clipboard.writeText('0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC');
+                  document.execCommand('copy');
                   setCopiedAddress('ETH');
                   setTimeout(() => setCopiedAddress(null), 2000);
                 } catch (err) {
-                  // Fallback for browsers that don't support clipboard API
-                  const textArea = document.createElement('textarea');
-                  textArea.value = '0xe4bB184781bBC9C7004e8DafD4A9B49d203BC9bC';
-                  document.body.appendChild(textArea);
-                  textArea.select();
-                  try {
-                    document.execCommand('copy');
-                    setCopiedAddress('ETH');
-                    setTimeout(() => setCopiedAddress(null), 2000);
-                  } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                  }
-                  document.body.removeChild(textArea);
+                  console.error('Failed to copy text: ', err);
                 }
-              }}
-            >
-              {window.innerWidth > 768 ? 'ETH: 0xe4b...9bC' : 'ETH'}
-              <CopiedTooltip $visible={copiedAddress === 'ETH'}>Copied!</CopiedTooltip>
-            </WalletAddress>
+                document.body.removeChild(textArea);
+              }
+            }}
+          >
+            {window.innerWidth > 768 ? 'ETH: 0xe4b...9bC' : 'ETH'}
+            <CopiedTooltip $visible={copiedAddress === 'ETH'}>Copied!</CopiedTooltip>
+          </WalletAddress>
 
-            <WalletAddress 
-              onClick={async () => {
+          <WalletAddress 
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText('bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g');
+                setCopiedAddress('BTC');
+                setTimeout(() => setCopiedAddress(null), 2000);
+              } catch (err) {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = 'bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g';
+                document.body.appendChild(textArea);
+                textArea.select();
                 try {
-                  await navigator.clipboard.writeText('bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g');
+                  document.execCommand('copy');
                   setCopiedAddress('BTC');
                   setTimeout(() => setCopiedAddress(null), 2000);
                 } catch (err) {
-                  // Fallback for browsers that don't support clipboard API
-                  const textArea = document.createElement('textarea');
-                  textArea.value = 'bc1qrglll5kcgjk7lrwll4mzfcw0yxm0zh9anq7x6g';
-                  document.body.appendChild(textArea);
-                  textArea.select();
-                  try {
-                    document.execCommand('copy');
-                    setCopiedAddress('BTC');
-                    setTimeout(() => setCopiedAddress(null), 2000);
-                  } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                  }
-                  document.body.removeChild(textArea);
+                  console.error('Failed to copy text: ', err);
                 }
-              }}
-            >
-              {window.innerWidth > 768 ? 'BTC: bc1q...6g' : 'BTC'}
-              <CopiedTooltip $visible={copiedAddress === 'BTC'}>Copied!</CopiedTooltip>
-            </WalletAddress>
+                document.body.removeChild(textArea);
+              }
+            }}
+          >
+            {window.innerWidth > 768 ? 'BTC: bc1q...6g' : 'BTC'}
+            <CopiedTooltip $visible={copiedAddress === 'BTC'}>Copied!</CopiedTooltip>
+          </WalletAddress>
 
-            <WalletAddress 
-              onClick={async () => {
+          <WalletAddress 
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText('8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x');
+                setCopiedAddress('SOL');
+                setTimeout(() => setCopiedAddress(null), 2000);
+              } catch (err) {
+                // Fallback for browsers that don't support clipboard API
+                const textArea = document.createElement('textarea');
+                textArea.value = '8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x';
+                document.body.appendChild(textArea);
+                textArea.select();
                 try {
-                  await navigator.clipboard.writeText('8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x');
+                  document.execCommand('copy');
                   setCopiedAddress('SOL');
                   setTimeout(() => setCopiedAddress(null), 2000);
                 } catch (err) {
-                  // Fallback for browsers that don't support clipboard API
-                  const textArea = document.createElement('textarea');
-                  textArea.value = '8bXf8Rg3u4Prz71LgKR5mpa7aMe2F4cSKYYRctmqro6x';
-                  document.body.appendChild(textArea);
-                  textArea.select();
-                  try {
-                    document.execCommand('copy');
-                    setCopiedAddress('SOL');
-                    setTimeout(() => setCopiedAddress(null), 2000);
-                  } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                  }
-                  document.body.removeChild(textArea);
+                  console.error('Failed to copy text: ', err);
                 }
-              }}
-            >
-              {window.innerWidth > 768 ? 'SOL: 8bXf...6x' : 'SOL'}
-              <CopiedTooltip $visible={copiedAddress === 'SOL'}>Copied!</CopiedTooltip>
-            </WalletAddress>
-          </StatusSection>
-        </StatusBar>
-      </BubblesGrid>
+                document.body.removeChild(textArea);
+              }
+            }}
+          >
+            {window.innerWidth > 768 ? 'SOL: 8bXf...6x' : 'SOL'}
+            <CopiedTooltip $visible={copiedAddress === 'SOL'}>Copied!</CopiedTooltip>
+          </WalletAddress>
+        </StatusSection>
+      </StatusBar>
 
       {selectedToken && (
         <TokenModal
           token={selectedToken}
           onClose={() => setSelectedToken(null)}
+          timeFrame={timeFrame}
         />
       )}
     </Container>

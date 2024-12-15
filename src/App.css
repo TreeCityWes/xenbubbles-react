@@ -4,6 +4,11 @@ html, body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  background: #1a1a1a;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 .App {
@@ -16,7 +21,6 @@ svg {
   display: block;
   width: 100%;
   height: 100%;
-  background: #1a1a1a;
 }
 
 .bubble:hover circle {
@@ -28,4 +32,21 @@ svg {
 .bubble text {
   pointer-events: none;
   user-select: none;
+}
+
+/* Add proper z-index stacking context */
+.modal-overlay {
+  z-index: 2000;
+}
+
+.mobile-controls {
+  z-index: 1001;
+}
+
+.header {
+  z-index: 1002;
+}
+
+.status-bar {
+  z-index: 1001;
 } 

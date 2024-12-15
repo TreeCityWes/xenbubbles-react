@@ -37,23 +37,27 @@ const BubbleContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: ${props => props.size * 0.15}px;
-  background: radial-gradient(circle at center, rgba(0,0,0,0.85), rgba(0,0,0,0.95));
+  padding: ${props => Math.max(props.size * 0.10, 10)}px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0,0,0,0.9),
+    rgba(0,0,0,0.95)
+  );
   box-sizing: border-box;
   cursor: pointer;
   position: relative;
   z-index: 2;
   box-shadow: ${props => props.$value >= 0 
-    ? '0 0 20px rgba(57, 255, 20, 0.3)' 
-    : '0 0 20px rgba(255, 57, 57, 0.3)'};
+    ? '0 0 20px rgba(57, 255, 20, 0.4)'
+    : '0 0 20px rgba(255, 57, 57, 0.4)'};
 
   @media (max-width: 768px) {
-    padding: ${props => Math.min(props.size * 0.15, 15)}px;
-    gap: ${props => Math.min(props.size * 0.05, 6)}px;
+    padding: ${props => Math.max(6, Math.min(props.size * 0.10, 10))}px;
+    gap: ${props => Math.max(6, Math.min(props.size * 0.06, 8))}px;
     border-radius: 8px;
     background: ${props => props.$value >= 0 
-      ? 'rgba(57, 255, 20, 0.1)'
-      : 'rgba(255, 57, 57, 0.1)'
+      ? 'rgba(57, 255, 20, 0.15)'
+      : 'rgba(255, 57, 57, 0.15)'
     };
     border: 1px solid ${props => props.$value >= 0 ? '#39FF14' : '#FF3939'};
   }
@@ -61,45 +65,90 @@ const BubbleContainer = styled.div`
 
 const TokenSymbol = styled.div`
   color: white;
-  font-size: ${props => Math.max(props.size * 0.14, 12)}px;
+  font-size: ${props => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth >= 3840) return Math.max(16, props.size * 0.18);
+    if (screenWidth >= 2560) return Math.max(14, props.size * 0.16);
+    if (screenWidth >= 1920) return Math.max(12, props.size * 0.14);
+    return Math.max(11, props.size * 0.13);
+  }}px;
   font-weight: bold;
   text-align: center;
   position: relative;
   z-index: 2;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  width: 100%;
 
   @media (max-width: 768px) {
-    font-size: ${props => Math.min(props.size * 0.16, 13)}px;
+    font-size: ${props => Math.max(11, Math.min(props.size * 0.16, 14))}px;
     margin-bottom: 2px;
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 4px);
+    padding: 0 2px;
   }
+`;
+
+const ChainIndicator = styled.div`
+  font-size: ${props => props.size * 0.08}px;
+  color: #39FF14;
+  opacity: 0.8;
+  margin-top: 2px;
+  text-transform: uppercase;
 `;
 
 const TokenPrice = styled.div`
   color: ${props => props.$priceChange >= 0 ? '#39FF14' : '#FF3939'};
-  font-size: ${props => Math.max(props.size * 0.12, 10)}px;
+  font-size: ${props => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth >= 3840) return Math.max(14, props.size * 0.16);
+    if (screenWidth >= 2560) return Math.max(12, props.size * 0.14);
+    if (screenWidth >= 1920) return Math.max(11, props.size * 0.12);
+    return Math.max(10, props.size * 0.11);
+  }}px;
   text-align: center;
   position: relative;
   z-index: 2;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  width: 100%;
 
   @media (max-width: 768px) {
-    font-size: ${props => Math.min(props.size * 0.14, 11)}px;
+    font-size: ${props => Math.max(10, Math.min(props.size * 0.14, 12))}px;
     margin: 1px 0;
     line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 2px;
   }
 `;
 
 const PriceChange = styled.div`
   color: ${props => props.$value >= 0 ? '#39FF14' : '#FF3939'};
-  font-size: ${props => Math.max(props.size * 0.12, 11)}px;
+  font-size: ${props => {
+    const screenWidth = window.innerWidth;
+    if (screenWidth >= 3840) return Math.max(14, props.size * 0.16);
+    if (screenWidth >= 2560) return Math.max(12, props.size * 0.14);
+    if (screenWidth >= 1920) return Math.max(11, props.size * 0.12);
+    return Math.max(10, props.size * 0.11);
+  }}px;
   font-weight: bold;
   text-align: center;
   position: relative;
   z-index: 2;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  width: 100%;
 
   @media (max-width: 768px) {
-    font-size: ${props => Math.min(props.size * 0.14, 11)}px;
-    margin-top: 2px;
+    font-size: ${props => Math.max(10, Math.min(props.size * 0.14, 12))}px;
+    margin-top: 1px;
     line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 2px;
   }
 `;
 
@@ -198,16 +247,12 @@ export const formatPrice = (num) => {
 const getLogoForList = (listId) => {
   switch (String(listId)) {
     case 'DBXen':
-      console.log('Using DBXen logo for', listId);
       return dbxenLogo;
     case 'Xen-Alts':
-      console.log('Using Xen-Alts logo for', listId);
       return treeLogo;
     case 'Xen':
-      console.log('Using Xen logo for', listId);
       return xenLogo;
     default:
-      console.log('Using default logo for', listId);
       return xenLogo;
   }
 };
@@ -219,6 +264,8 @@ const Bubble = ({ size, data, onClick, selectedTab, sizeMode }) => {
   const isMobile = window.innerWidth <= 768;
   
   const [logoSrc, setLogoSrc] = useState(() => {
+    if (data.baseToken?.logoUrl) return data.baseToken.logoUrl;
+    if (data.logoUrl) return data.logoUrl;
     if (data.imageUrl) return data.imageUrl;
     return getLogoForList(data.sourceList || data.listId);
   });
@@ -248,8 +295,16 @@ const Bubble = ({ size, data, onClick, selectedTab, sizeMode }) => {
     }
   }, [data.price]);
 
-  const symbol = data.baseToken?.symbol || data.symbol || 'Unknown';
+  const formatSymbol = (symbol) => {
+    if (window.innerWidth <= 768) {
+      return symbol.length > 8 ? `${symbol.slice(0, 6)}...` : symbol;
+    }
+    return symbol;
+  };
+
+  const symbol = formatSymbol(data.baseToken?.symbol || data.symbol || 'Unknown');
   const priceChange = data.priceChange24h || 0;
+  const liquidity = data.liquidity || data.liquidityUsd || 0;
   
   const formatMarketCap = (marketCap) => {
     if (!marketCap) return '$0';
@@ -269,7 +324,9 @@ const Bubble = ({ size, data, onClick, selectedTab, sizeMode }) => {
       $value={priceChange}
     >
       <CircleBackground $priceChange={priceChange} $value={priceChange} />
-      <TokenSymbol size={size}>{symbol}</TokenSymbol>
+      <TokenSymbol size={size} title={data.baseToken?.symbol || data.symbol}>
+        {symbol}
+      </TokenSymbol>
       <TokenPrice size={size} $priceChange={priceChange}>
         {formatPrice(data.price)}
       </TokenPrice>

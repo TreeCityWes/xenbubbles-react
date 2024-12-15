@@ -15,29 +15,25 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
+  z-index: 2000;
+  backdrop-filter: blur(4px);
 `;
 
 const ModalContent = styled.div`
-  background: #0b0f12;
+  background: rgba(0, 0, 0, 0.95);
   border: 1px solid #39FF14;
   border-radius: 8px;
   padding: 20px;
-  max-width: 95%;
-  width: 800px;
+  max-width: 90%;
+  width: 500px;
   position: relative;
-  box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
-  z-index: 1001;
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+  z-index: 2001;
 
   @media (max-width: 768px) {
-    width: 90%;
-    padding: 12px;
+    max-width: 95%;
+    padding: 15px;
     margin: 10px;
-    max-height: 80vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
   }
 `;
 
@@ -113,42 +109,17 @@ const ActionButton = styled.a`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 32px;
-  height: 32px;
-  background: #000;
-  border: 2px solid #39FF14;
-  border-radius: 50%;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
   color: #39FF14;
   font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  z-index: 2;
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
-  padding: 0;
-  line-height: 0;
-
-  & > span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    margin-top: -2px;
-  }
+  z-index: 2002;
 
   &:hover {
-    background: rgba(57, 255, 20, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-    font-size: 28px;
+    color: #fff;
   }
 `;
 
